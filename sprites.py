@@ -98,7 +98,10 @@ class SpiderWall(pg.sprite.Sprite):
         self.target = target
 
     def movement_wall(self):
-        self.dif_distance =  
+        self.vx, self.vy = ((self.target.rect.x - self.rect.x)/math.sqrt((self.target.rect.x - self.rect.x) ** 2 + (yp - yz) ** 2), (yp - yz)/math.sqrt((self.target.rect.x - self.rect.x) ** 2 + (yp - yz) ** 2))
+        self.vx, self.vy = self.rect.x - self.target.rect.x, self.rect.y - self.target.rect.y
+        self.dist = math.hypot(self.vx,self.vy)
+        self.vx,self.vy = self.vx/self.dist, self.vy/self.dist
 
     def collide_with_walls(self, dir):
         if dir == 'x':
@@ -121,15 +124,8 @@ class SpiderWall(pg.sprite.Sprite):
                 self.rect.y = self.y
 
     def update(self):
-        self.x=0
-        self.y=0
         self.movement_wall()
-        self.x += self.vx
-        self.y += self.vy
-        print(self.x,self.y)
-        self.rect.x = self.x + self.target.rect.x
+        self.rect.x += self.vx
         self.collide_with_walls('x')
-        self.rect.y = self.y + self.target.rect.y
+        self.rect.y += self.vy
         self.collide_with_walls('y')
-        print(self.rect)
-        print("------------------------------------------")
