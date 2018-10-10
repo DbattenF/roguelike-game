@@ -28,29 +28,19 @@ class Game:
         self.previous_w = 0
         self.previous_h = 0
 
-    def create_map(self,mapa,orientation=True):#orientation TRUE == horizontal orientation FALSE == vertical
-        if(orientation):
-            for row, tiles in enumerate(mapa.data):
-                for col, tile in enumerate(tiles):
-                    if tile == '1':
-                        Wall(self, col+self.previous_w, row)
-                    if tile == '#':
-                        Door(self,col+self.previous_w, row)
-                    if tile == 'P':
-                        self.player = Player(self, col, row)
-                    if tile == 'E':
-                        self.enemi = SpiderWall(self, col, row, self.player)    
-            self.total_map_w += mapa.tilewidth
-        else:
-            for row, tiles in enumerate(mapa.data):
-                for col, tile in enumerate(tiles):
-                    if tile == '1':
-                        Wall(self, col, row+self.previous_h)
-                    if tile == '#':
-                        Door(self,col, row+self.previous_h)
-                    if tile == 'P':
-                        self.player = Player(self, col, row)
-            self.total_map_h += mapa.tileheight
+    def create_map(self,mapa):
+        for row, tiles in enumerate(mapa.data):
+            for col, tile in enumerate(tiles):
+                if tile == '1':
+                    Wall(self, col+self.previous_w, row)
+                if tile == '#':
+                    Door(self,col+self.previous_w, row)
+                if tile == 'P':
+                    self.player = Player(self, col, row)
+                if tile == 'E':
+                    self.enemi = SpiderWall(self, col+self.previous_w, row, self.player)    
+        self.total_map_w += mapa.tilewidth
+        self.total_map_h += mapa.tileheight
         self.previous_h = mapa.tileheight
         self.previous_w = mapa.tilewidth
 
@@ -60,7 +50,6 @@ class Game:
         self.walls = pg.sprite.Group()
         self.create_map(self.map)
         self.create_map(self.map2)
-        self.create_map(self.map3,False)
         self.mapwitdh=self.map.width+self.map2.width
         self.mapheight=self.map.height+self.map2.height
         self.camera = Camera(self.mapwitdh,self.mapheight)

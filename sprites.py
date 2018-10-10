@@ -93,15 +93,18 @@ class SpiderWall(pg.sprite.Sprite):
         self.image.fill(YELLOW)
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0, 0
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
         self.target = target
+        self.speed = 3
 
     def movement_wall(self):
-        self.vx, self.vy = ((self.target.rect.x - self.rect.x)/math.sqrt((self.target.rect.x - self.rect.x) ** 2 + (yp - yz) ** 2), (yp - yz)/math.sqrt((self.target.rect.x - self.rect.x) ** 2 + (yp - yz) ** 2))
-        self.vx, self.vy = self.rect.x - self.target.rect.x, self.rect.y - self.target.rect.y
-        self.dist = math.hypot(self.vx,self.vy)
-        self.vx,self.vy = self.vx/self.dist, self.vy/self.dist
+        self.vx, self.vy = self.target.rect.x - self.rect.x, self.target.rect.y - self.rect.y 
+        dist = math.hypot(self.vx, self.vy)
+        if dist == 0:
+            dist = 1
+        else:
+            self.vx, self.vy = self.vx / dist, self.vy / dist
 
     def collide_with_walls(self, dir):
         if dir == 'x':
@@ -124,8 +127,10 @@ class SpiderWall(pg.sprite.Sprite):
                 self.rect.y = self.y
 
     def update(self):
+        print(self.rect)
         self.movement_wall()
-        self.rect.x += self.vx
+        self.rect.x += self.vx * self.speed
+        print(self.vx*self.speed)
         self.collide_with_walls('x')
-        self.rect.y += self.vy
+        self.rect.y += self.vy * self.speed
         self.collide_with_walls('y')
