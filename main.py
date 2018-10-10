@@ -38,7 +38,9 @@ class Game:
                 if tile == 'P':
                     self.player = Player(self, col, row)
                 if tile == 'E':
-                    self.enemi = SpiderWall(self, col+self.previous_w, row, self.player)    
+                    self.enemi = Chaser(self, col+self.previous_w, row, self.player)
+                if tile == 'S':
+                    self.enemi = SpiderWall(self, col+self.previous_w, row,0,self.total_map_w)        
         self.total_map_w += mapa.tilewidth
         self.total_map_h += mapa.tileheight
         self.previous_h = mapa.tileheight

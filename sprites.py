@@ -1,6 +1,7 @@
 import pygame as pg
 from settings import *
 import math
+import random
 
 class Player(pg.sprite.Sprite):
     def __init__(self, game, x, y):
@@ -84,7 +85,7 @@ class Door(pg.sprite.Sprite):
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
 
-class SpiderWall(pg.sprite.Sprite):
+class Chaser(pg.sprite.Sprite):
     def __init__(self, game, x, y, target):
         self.groups = game.all_sprites
         pg.sprite.Sprite.__init__(self, self.groups)
@@ -127,10 +128,46 @@ class SpiderWall(pg.sprite.Sprite):
                 self.rect.y = self.y
 
     def update(self):
-        print(self.rect)
         self.movement_wall()
         self.rect.x += self.vx * self.speed
         print(self.vx*self.speed)
         self.collide_with_walls('x')
         self.rect.y += self.vy * self.speed
         self.collide_with_walls('y')
+
+class SpiderWall(pg.sprite.Sprite):
+    def __init__(self, game, x, y,dire,mapa):
+        self.groups = game.all_sprites
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image.fill(LIGHTGREY)
+        self.rect = self.image.get_rect()
+        self.vx, self.vy = 0, 0
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
+        self.speed = 3
+        self.dir = dire
+        self.derecha=False
+        self.mapa = mapa
+
+
+    def collide_with_walls(self, dir):
+        hits = pg.sprite.spritecollide(self, self.game.walls, False)
+        if self.derecha==True:
+            if hits:
+                self.derecha = False
+            else:
+                self.vx = 3
+        else:
+            if hits:
+                self.derecha=True
+            else:
+                self.vx = -3
+
+
+
+    def update(self):
+        self.collide_with_walls('x')
+        self.rect.x += self.vx
+        self.rect.y += self.vy
