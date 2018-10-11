@@ -3,6 +3,8 @@ from settings import *
 import math
 import random
 
+DIRECCIONES = ['UP','DOWN','RIGHT','LEFT']
+
 class Player(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites
@@ -147,27 +149,25 @@ class SpiderWall(pg.sprite.Sprite):
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
         self.speed = 3
-        self.dir = dire
-        self.derecha=False
-        self.mapa = mapa
+        self.direccion = 'UP'
 
 
-    def collide_with_walls(self, dir):
+    def mover(self):
+        if self.direccion=='UP':
+            self.vy = -self.speed
+        elif self.direccion=='DOWN':
+            self.vy = self.speed
+        elif self.direccion=='RIGHT':
+            self.vx = self.speed
+        elif self.direccion=='LEFT':
+            self.vx = -self.speed
+
+    def collide_with_walls(self):
         hits = pg.sprite.spritecollide(self, self.game.walls, False)
-        if self.derecha==True:
-            if hits:
-                self.derecha = False
-            else:
-                self.vx = 3
-        else:
-            if hits:
-                self.derecha=True
-            else:
-                self.vx = -3
-
+        
 
 
     def update(self):
-        self.collide_with_walls('x')
+        self.collide_with_walls()
         self.rect.x += self.vx
         self.rect.y += self.vy
