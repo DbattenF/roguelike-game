@@ -8,7 +8,7 @@ import random
 from os import path
 from settings import *
 from sprites import *
-from tilemap import *
+from tilemap import * 
 
 class Game:
     def __init__(self):
@@ -17,6 +17,7 @@ class Game:
         pg.display.set_caption(TITLE)
         self.clock = pg.time.Clock()
         self.load_data()
+        self.lista_disparos = pg.sprite.Group()
 
     def load_data(self):
         game_folder = path.dirname(__file__)
@@ -40,7 +41,9 @@ class Game:
                 if tile == 'E':
                     self.enemi = Chaser(self, col+self.previous_w, row, self.player)
                 if tile == 'S':
-                    self.enemi = SpiderWall(self, col+self.previous_w, row,0,self.total_map_w)        
+                    self.enemi = SpiderWall_y(self, col+self.previous_w, row,0,self.total_map_w)
+                if tile == 'Z':
+                    self.enemi = SpiderWall_x(self, col+self.previous_w, row,0,self.total_map_w)        
         self.total_map_w += mapa.tilewidth
         self.total_map_h += mapa.tileheight
         self.previous_h = mapa.tileheight
@@ -95,6 +98,18 @@ class Game:
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
                     self.quit()
+                if event.key == pg.K_w:
+                    disparo = Disparo(self,self.player.rect.x,self.player.rect.y,"up")
+                    self.lista_disparos.add(disparo)
+                if event.key == pg.K_s:
+                    disparo = Disparo(self,self.player.rect.x,self.player.rect.y,"down")
+                    self.lista_disparos.add(disparo)
+                if event.key == pg.K_d:
+                    disparo = Disparo(self,self.player.rect.x,self.player.rect.y,"right")
+                    self.lista_disparos.add(disparo)
+                if event.key == pg.K_a:
+                    disparo = Disparo(self,self.player.rect.x,self.player.rect.y,"left")
+                    self.lista_disparos.add(disparo)
 
     def show_start_screen(self):
         #import pdb; pdb.set_trace()
@@ -111,3 +126,4 @@ def main():
         g.new()
         g.run()
         g.show_go_screen()
+main()
