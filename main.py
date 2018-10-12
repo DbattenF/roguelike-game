@@ -18,6 +18,8 @@ class Game:
         self.clock = pg.time.Clock()
         self.load_data()
         self.lista_disparos = pg.sprite.Group()
+        self.lista_enemigos = pg.sprite.Group()
+        self.lista_paredes = pg.sprite.Group()
 
     def load_data(self):
         game_folder = path.dirname(__file__)
@@ -33,17 +35,22 @@ class Game:
         for row, tiles in enumerate(mapa.data):
             for col, tile in enumerate(tiles):
                 if tile == '1':
-                    Wall(self, col+self.previous_w, row)
+                    wall=Wall(self, col+self.previous_w, row)
+                    self.lista_paredes.add(wall)
                 if tile == '#':
                     Door(self,col+self.previous_w, row)
                 if tile == 'P':
                     self.player = Player(self, col, row)
                 if tile == 'E':
                     self.enemi = Chaser(self, col+self.previous_w, row, self.player)
+                    self.lista_enemigos.add(self.enemi)
                 if tile == 'S':
                     self.enemi = SpiderWall_y(self, col+self.previous_w, row,0,self.total_map_w)
+                    self.lista_enemigos.add(self.enemi)
                 if tile == 'Z':
-                    self.enemi = SpiderWall_x(self, col+self.previous_w, row,0,self.total_map_w)        
+                    self.enemi = SpiderWall_x(self, col+self.previous_w, row,0,self.total_map_w) 
+                    self.lista_enemigos.add(self.enemi)
+
         self.total_map_w += mapa.tilewidth
         self.total_map_h += mapa.tileheight
         self.previous_h = mapa.tileheight
@@ -99,16 +106,16 @@ class Game:
                 if event.key == pg.K_ESCAPE:
                     self.quit()
                 if event.key == pg.K_w:
-                    disparo = Disparo(self,self.player.rect.x,self.player.rect.y,"up")
+                    disparo = Disparo(self,self.player.rect.x,self.player.rect.y,"up",self.lista_paredes,self.lista_enemigos)
                     self.lista_disparos.add(disparo)
                 if event.key == pg.K_s:
-                    disparo = Disparo(self,self.player.rect.x,self.player.rect.y,"down")
+                    disparo = Disparo(self,self.player.rect.x,self.player.rect.y,"down",self.lista_paredes,self.lista_enemigos)
                     self.lista_disparos.add(disparo)
                 if event.key == pg.K_d:
-                    disparo = Disparo(self,self.player.rect.x,self.player.rect.y,"right")
+                    disparo = Disparo(self,self.player.rect.x,self.player.rect.y,"right",self.lista_paredes,self.lista_enemigos)
                     self.lista_disparos.add(disparo)
                 if event.key == pg.K_a:
-                    disparo = Disparo(self,self.player.rect.x,self.player.rect.y,"left")
+                    disparo = Disparo(self,self.player.rect.x,self.player.rect.y,"left",self.lista_paredes,self.lista_enemigos)
                     self.lista_disparos.add(disparo)
 
     def show_start_screen(self):

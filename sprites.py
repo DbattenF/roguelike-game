@@ -240,7 +240,7 @@ class Disparo(pg.sprite.Sprite):
     cambio_x = 0
     cambio_y = 0
   
-    def __init__(self, game, x, y,direccion):
+    def __init__(self, game, x, y,direccion,paredes,enemigos):
         self.groups = game.all_sprites
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
@@ -251,6 +251,8 @@ class Disparo(pg.sprite.Sprite):
         self.rect.y = y
         self.rect.x = x
         self.dir=direccion
+        self.paredes = paredes
+        self.enemigos = enemigos
     
     def d_up(self):
         self.rect.top -= 5
@@ -270,10 +272,11 @@ class Disparo(pg.sprite.Sprite):
             self.d_right()
         if self.dir=="left":
             self.d_left()
+        self.colision()
 
-    def colision(self,paredes,enemigos):
-        lista_paredes = pg.sprite.spritecollide(self,paredes,False)
-        lista_enemigos = pg.sprite.spritecollide(self,enemigos,False)
+    def colision(self):
+        lista_paredes = pg.sprite.spritecollide(self,self.paredes,False)
+        lista_enemigos = pg.sprite.spritecollide(self,self.enemigos,False)
         for i in lista_paredes:
             self.kill()
 
