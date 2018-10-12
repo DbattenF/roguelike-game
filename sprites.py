@@ -18,6 +18,7 @@ class Player(pg.sprite.Sprite):
         self.vx, self.vy = 0, 0
         self.x = x * TILESIZE
         self.y = y * TILESIZE
+        self.items = ''
 
     def get_keys(self):
         self.vx, self.vy = 0, 0
@@ -98,6 +99,7 @@ class Chaser(pg.sprite.Sprite):
         self.image.fill(YELLOW)
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0, 0
+        self.heal = 3
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
         self.target = target
@@ -147,6 +149,7 @@ class SpiderWall_y(pg.sprite.Sprite):
         self.image.fill(LIGHTGREY)
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0, 0
+        self.heal = 2
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
         self.speed = 3
@@ -195,6 +198,7 @@ class SpiderWall_x(pg.sprite.Sprite):
         self.image.fill(LIGHTGREY)
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0, 0
+        self.heal = 2
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
         self.speed = 3
@@ -240,17 +244,19 @@ class Disparo(pg.sprite.Sprite):
     cambio_x = 0
     cambio_y = 0
   
-    def __init__(self, game, x, y,direccion,paredes,enemigos):
+    def __init__(self, game, x, y,target,direccion,paredes,enemigos):
         self.groups = game.all_sprites
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.Surface((8,8))
+        self.image = pg.Surface((10,10))
         self.image.fill(WHITE)
         self.rect = self.image.get_rect()
         self.v_disparo = 0
+        self.damage = 1
         self.rect.y = y
         self.rect.x = x
         self.dir=direccion
+        self.target = target
         self.paredes = paredes
         self.enemigos = enemigos
     
@@ -263,7 +269,7 @@ class Disparo(pg.sprite.Sprite):
     def d_left(self):
         self.rect.left -= 5
 
-    def update(self):
+    def dir_disparo(self):
         if self.dir=="up":
             self.d_up()
         if self.dir=="down":
@@ -272,6 +278,9 @@ class Disparo(pg.sprite.Sprite):
             self.d_right()
         if self.dir=="left":
             self.d_left()
+
+    def update(self):
+        self.dir_disparo()
         self.colision()
 
     def colision(self):
@@ -282,3 +291,29 @@ class Disparo(pg.sprite.Sprite):
 
         for i in lista_enemigos:
             self.kill()
+            i.heal -= self.damage
+            if i.heal ==0:
+                i.kill()
+
+class DoubleShot(pg.sprite.Sprite):
+
+    def __init__(self, game, x, y,target):
+        self.groups = game.all_sprites
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((32,32))
+        self.image.fill(WHITE)
+        self.rect = self.image.get_rect()
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
+        self.target = target
+
+    def colision(self):
+        hits = pg.sprite.collide_rect(self,self.target)
+        if hits:
+            self.kill()
+            self.target.items='ds'
+            print("sadasd")
+
+    def update(self):
+        self.colision()
