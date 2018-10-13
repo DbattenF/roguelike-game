@@ -51,7 +51,11 @@ class Game:
                     self.enemi = SpiderWall_x(self, col+self.previous_w, row,0,self.total_map_w) 
                     self.lista_enemigos.add(self.enemi)
                 if tile == 'D':
-                    self.item = DoubleShot(self, col+self.previous_w, row,self.player) 
+                    self.item = DoubleShot(self, col+self.previous_w, row,self.player)
+                if tile == 'B':
+                    self.item = BouncingShot(self, col+self.previous_w, row,self.player)
+                if tile == 'T':
+                    self.item = Penetring(self, col+self.previous_w, row,self.player) 
 
         self.total_map_w += mapa.tilewidth
         self.total_map_h += mapa.tileheight
@@ -100,7 +104,6 @@ class Game:
         pg.display.flip()
 
     def events(self):
-        # catch all events here
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.quit()

@@ -259,6 +259,11 @@ class Disparo(pg.sprite.Sprite):
         self.target = target
         self.paredes = paredes
         self.enemigos = enemigos
+
+
+    def setup_damage(self):
+        if self.target.items=='ps':
+            self.damage = 0.25
     
     def d_up(self):
         self.rect.top -= 5
@@ -280,6 +285,8 @@ class Disparo(pg.sprite.Sprite):
             self.d_left()
 
     def update(self):
+        print(self.target.items)
+        self.setup_damage()
         self.dir_disparo()
         self.colision()
 
@@ -287,10 +294,23 @@ class Disparo(pg.sprite.Sprite):
         lista_paredes = pg.sprite.spritecollide(self,self.paredes,False)
         lista_enemigos = pg.sprite.spritecollide(self,self.enemigos,False)
         for i in lista_paredes:
-            self.kill()
+            if self.target.items=='bs':
+                if self.dir=='up':
+                    self.dir='down'
+                elif self.dir=='down':
+                    self.dir='up'
+                elif self.dir=='right':
+                    self.dir='left'
+                elif self.dir=='left':
+                    self.dir='right'
+            else:
+                self.kill()
 
         for i in lista_enemigos:
-            self.kill()
+            if self.target.items=='ps':
+                pass
+            else:
+                self.kill()
             i.heal -= self.damage
             if i.heal ==0:
                 i.kill()
@@ -314,6 +334,50 @@ class DoubleShot(pg.sprite.Sprite):
             self.kill()
             self.target.items='ds'
             print("sadasd")
+
+    def update(self):
+        self.colision()
+
+class BouncingShot(pg.sprite.Sprite):
+
+    def __init__(self, game, x, y,target):
+        self.groups = game.all_sprites
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((32,32))
+        self.image.fill(WHITE)
+        self.rect = self.image.get_rect()
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
+        self.target = target
+
+    def colision(self):
+        hits = pg.sprite.collide_rect(self,self.target)
+        if hits:
+            self.kill()
+            self.target.items='bs'
+
+    def update(self):
+        self.colision()
+
+class Penetring(pg.sprite.Sprite):
+
+    def __init__(self, game, x, y,target):
+        self.groups = game.all_sprites
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((32,32))
+        self.image.fill(WHITE)
+        self.rect = self.image.get_rect()
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
+        self.target = target
+
+    def colision(self):
+        hits = pg.sprite.collide_rect(self,self.target)
+        if hits:
+            self.kill()
+            self.target.items='ps'
 
     def update(self):
         self.colision()
