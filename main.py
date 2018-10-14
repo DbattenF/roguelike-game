@@ -25,7 +25,7 @@ class Game:
         game_folder = path.dirname(__file__)
         self.map = Map(path.join(game_folder, 'map2.txt'))
         self.map2 = Map(path.join(game_folder,'map.txt'))
-        self.map3 = Map(path.join(game_folder,'map3.txt'))
+        self.room_item = Map(path.join(game_folder,'room_item.txt'))
         self.total_map_w = 0
         self.total_map_h = 0
         self.previous_w = 0
@@ -35,32 +35,40 @@ class Game:
         for row, tiles in enumerate(mapa.data):
             for col, tile in enumerate(tiles):
                 if tile == '1':
-                    wall=Wall(self, col+self.previous_w, row)
+                    wall=Wall(self, col+self.total_map_w, row)
                     self.lista_paredes.add(wall)
                 if tile == '#':
-                    Door(self,col+self.previous_w, row)
+                    Door(self,col+self.total_map_w, row)
                 if tile == 'P':
                     self.player = Player(self, col, row)
                 if tile == 'E':
-                    self.enemi = Chaser(self, col+self.previous_w, row, self.player)
+                    self.enemi = Chaser(self, col+self.total_map_w, row, self.player)
                     self.lista_enemigos.add(self.enemi)
                 if tile == 'S':
-                    self.enemi = SpiderWall_y(self, col+self.previous_w, row,0,self.total_map_w)
+                    self.enemi = SpiderWall_y(self, col+self.total_map_w, row,0,self.total_map_w)
                     self.lista_enemigos.add(self.enemi)
                 if tile == 'Z':
-                    self.enemi = SpiderWall_x(self, col+self.previous_w, row,0,self.total_map_w) 
+                    self.enemi = SpiderWall_x(self, col+self.total_map_w, row,0,self.total_map_w) 
                     self.lista_enemigos.add(self.enemi)
-                if tile == 'D':
-                    self.item = DoubleShot(self, col+self.previous_w, row,self.player)
-                if tile == 'B':
-                    self.item = BouncingShot(self, col+self.previous_w, row,self.player)
-                if tile == 'T':
-                    self.item = Penetring(self, col+self.previous_w, row,self.player) 
+                if tile=='D':
+                    self.deco = Barril(self, col+self.total_map_w, row, self.lista_disparos)
+                    self.lista_enemigos.add(self.deco)
+                if tile=='I':
+                    self.roomitem(col+self.total_map_w,row)
 
         self.total_map_w += mapa.tilewidth
         self.total_map_h += mapa.tileheight
         self.previous_h = mapa.tileheight
         self.previous_w = mapa.tilewidth
+
+    def roomitem(self,x,y):
+        self.id_item = random.randint(0,2)
+        if self.id_item==0:
+            self.item = DoubleShot(self,x,y,self.player)
+        elif self.id_item==1:
+            self.item = BouncingShot(self,x,y,self.player)
+        elif self.id_item==2:
+            self.item = Penetring(self,x,y,self.player)
 
     def new(self):
         # initialize all variables and do all the setup for a new game
@@ -68,8 +76,9 @@ class Game:
         self.walls = pg.sprite.Group()
         self.create_map(self.map)
         self.create_map(self.map2)
-        self.mapwitdh=self.map.width+self.map2.width
-        self.mapheight=self.map.height+self.map2.height
+        self.create_map(self.room_item)
+        self.mapwitdh=self.map.width+self.map2.width+self.room_item.width
+        self.mapheight=self.map.height+self.map2.height+self.room_item.height
         self.camera = Camera(self.mapwitdh,self.mapheight)
 
     def run(self):

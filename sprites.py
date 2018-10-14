@@ -69,8 +69,7 @@ class Wall(pg.sprite.Sprite):
         self.groups = game.all_sprites, game.walls
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(GREEN)
+        self.image = pg.image.load('wall.png')
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
@@ -95,8 +94,7 @@ class Chaser(pg.sprite.Sprite):
         self.groups = game.all_sprites
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(YELLOW)
+        self.image = pg.image.load('chase.png')
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0, 0
         self.heal = 3
@@ -248,8 +246,7 @@ class Disparo(pg.sprite.Sprite):
         self.groups = game.all_sprites
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.Surface((10,10))
-        self.image.fill(WHITE)
+        self.image = pg.image.load('bala.png')
         self.rect = self.image.get_rect()
         self.v_disparo = 0
         self.damage = 1
@@ -378,6 +375,28 @@ class Penetring(pg.sprite.Sprite):
         if hits:
             self.kill()
             self.target.items='ps'
+
+    def update(self):
+        self.colision()
+
+class Barril(pg.sprite.Sprite):
+
+    def __init__(self, game, x, y, disparo):
+        self.groups = game.all_sprites, game.walls
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.image.load('barrel.png')
+        self.rect = self.image.get_rect()
+        self.heal = 1
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
+        self.lista = disparo
+
+    def colision(self):
+        hits = pg.sprite.spritecollide(self,self.lista,False)
+        for i in hits:
+            self.kill()
+        
 
     def update(self):
         self.colision()
