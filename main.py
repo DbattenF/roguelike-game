@@ -8,7 +8,8 @@ import random
 from os import path
 from settings import *
 from sprites import *
-from tilemap import * 
+from tilemap import *
+from jefes import * 
 
 class Game:
     def __init__(self):
@@ -26,6 +27,7 @@ class Game:
         self.map = Map(path.join(game_folder, 'map2.txt'))
         self.map2 = Map(path.join(game_folder,'map.txt'))
         self.room_item = Map(path.join(game_folder,'room_item.txt'))
+        self.room_boss = Map(path.join(game_folder,'room_boss.txt'))
         self.total_map_w = 0
         self.total_map_h = 0
         self.previous_w = 0
@@ -37,6 +39,7 @@ class Game:
                 if tile == '1':
                     wall=Wall(self, col+self.total_map_w, row)
                     self.lista_paredes.add(wall)
+                    self.walls.add(wall)
                 if tile == '#':
                     Door(self,col+self.total_map_w, row)
                 if tile == 'P':
@@ -54,7 +57,10 @@ class Game:
                     self.deco = Barril(self, col+self.total_map_w, row, self.lista_disparos)
                     self.lista_enemigos.add(self.deco)
                 if tile=='I':
-                    self.roomitem(col+self.total_map_w,row)
+                    self.item = BouncingShot(self,col+self.total_map_w, row,self.player)
+                if tile=='J':
+                    self.jefes = Boss(self, col+self.total_map_w, row)
+                    self.lista_enemigos.add(self.jefes)
 
         self.total_map_w += mapa.tilewidth
         self.total_map_h += mapa.tileheight
@@ -77,8 +83,9 @@ class Game:
         self.create_map(self.map)
         self.create_map(self.map2)
         self.create_map(self.room_item)
-        self.mapwitdh=self.map.width+self.map2.width+self.room_item.width
-        self.mapheight=self.map.height+self.map2.height+self.room_item.height
+        self.create_map(self.room_boss)
+        self.mapwitdh=self.map.width+self.map2.width+self.room_item.width+self.room_boss.width
+        self.mapheight=self.map.height+self.map2.height+self.room_item.height+self.room_boss.height
         self.camera = Camera(self.mapwitdh,self.mapheight)
 
     def run(self):
@@ -170,5 +177,4 @@ def main():
     while True:
         g.new()
         g.run()
-        g.show_go_screen()
 main()

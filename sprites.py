@@ -16,6 +16,7 @@ class Player(pg.sprite.Sprite):
         self.image.fill(YELLOW)
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0, 0
+        self.heal = 10000
         self.x = x * TILESIZE
         self.y = y * TILESIZE
         self.items = ''
@@ -69,7 +70,8 @@ class Wall(pg.sprite.Sprite):
         self.groups = game.all_sprites, game.walls
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.image.load('wall.png')
+        self.image = pg.Surface((TILESIZE,TILESIZE))#pg.image.load('wall.png')
+        self.image.fill(GREEN)
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
@@ -229,10 +231,6 @@ class SpiderWall_x(pg.sprite.Sprite):
                 self.direccion = DIRECCIONES[direccion_actual - 1]
         self._avance()
 
-        
-        
-
-
     def update(self):
         self.mover()
         self.rect.x += self.vx
@@ -252,9 +250,8 @@ class Disparo(pg.sprite.Sprite):
         self.damage = 1
         self.rect.y = y
         self.rect.x = x
-        self.dir=direccion
+        self.dir = direccion
         self.target = target
-        self.paredes = paredes
         self.enemigos = enemigos
 
 
@@ -282,23 +279,24 @@ class Disparo(pg.sprite.Sprite):
             self.d_left()
 
     def update(self):
-        print(self.target.items)
+
         self.setup_damage()
         self.dir_disparo()
         self.colision()
 
     def colision(self):
-        lista_paredes = pg.sprite.spritecollide(self,self.paredes,False)
+        lista_paredes = pg.sprite.spritecollide(self,self.game.walls,False)
         lista_enemigos = pg.sprite.spritecollide(self,self.enemigos,False)
+        self.dir_ant = self.dir
         for i in lista_paredes:
             if self.target.items=='bs':
-                if self.dir=='up':
+                if self.dir_ant=='up':
                     self.dir='down'
-                elif self.dir=='down':
+                elif self.dir_ant=='down':
                     self.dir='up'
-                elif self.dir=='right':
+                elif self.dir_ant=='right':
                     self.dir='left'
-                elif self.dir=='left':
+                elif self.dir_ant=='left':
                     self.dir='right'
             else:
                 self.kill()
@@ -400,3 +398,5 @@ class Barril(pg.sprite.Sprite):
 
     def update(self):
         self.colision()
+
+       
