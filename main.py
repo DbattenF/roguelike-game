@@ -57,7 +57,7 @@ class Game:
                     self.deco = Barril(self, col+self.total_map_w, row, self.lista_disparos)
                     self.lista_enemigos.add(self.deco)
                 if tile=='I':
-                    self.item = BouncingShot(self,col+self.total_map_w, row,self.player)
+                    self.roomitem(col+self.total_map_w,row)
                 if tile=='J':
                     self.jefes = Boss(self, col+self.total_map_w, row)
                     self.lista_enemigos.add(self.jefes)
