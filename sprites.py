@@ -16,7 +16,8 @@ class Player(pg.sprite.Sprite):
         self.image.fill(YELLOW)
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0, 0
-        self.heal = 10000
+        self.heal = 1
+        self.dead = False
         self.x = x * TILESIZE
         self.y = y * TILESIZE
         self.items = ''
