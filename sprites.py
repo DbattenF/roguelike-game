@@ -16,7 +16,7 @@ class Player(pg.sprite.Sprite):
         self.image.fill(YELLOW)
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0, 0
-        self.heal = 1
+        self.heal = 3
         self.dead = False
         self.x = x * TILESIZE
         self.y = y * TILESIZE
@@ -175,7 +175,6 @@ class SpiderWall_y(pg.sprite.Sprite):
         hits = pg.sprite.spritecollide(self,self.game.walls,False)
         if hits:
             direccion_actual = DIRECCIONES.index(self.direccion)
-            print(direccion_actual)
             if direccion_actual == 0:
                 self.direccion = DIRECCIONES[direccion_actual + 1]
             elif direccion_actual == 1:
@@ -225,7 +224,6 @@ class SpiderWall_x(pg.sprite.Sprite):
         
         if hits:
             direccion_actual = DIRECCIONES.index(self.direccion)
-            print(direccion_actual)
             if direccion_actual == 2:
                 self.direccion = DIRECCIONES[direccion_actual + 1]
             if direccion_actual == 3:

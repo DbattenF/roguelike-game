@@ -5,7 +5,7 @@ import math
 import random
 
 DIRECCIONES = ['UP','DOWN','RIGHT','LEFT']
-dir_dis = ['up','down','right','left']
+dir_dis = ['down','right','left']
 
 class Boss(pg.sprite.Sprite):
 	def __init__(self, game, x, y):
@@ -16,7 +16,7 @@ class Boss(pg.sprite.Sprite):
 	    self.image.fill(LIGHTGREY)
 	    self.rect = self.image.get_rect()
 	    self.vx, self.vy = 0, 0
-	    self.heal = 500
+	    self.heal = 200
 	    self.rect.x = x * TILESIZE
 	    self.rect.y = y * TILESIZE
 	    self.speed = 3
@@ -29,9 +29,9 @@ class Boss(pg.sprite.Sprite):
 	    self.lista_player.add(self.game.player)
 
 	def disparo(self):
-			disparo = Disparos(self.game,self.rect.x,self.rect.y,self.game.walls,self.lista_player,'up',True)
+			disparo = Bullet_chase(self.game,self.rect.x,self.rect.y,self.game.walls)
 			self.game.lista_disparos.add(disparo)
-			disparo = Disparos(self.game,self.rect.x+96,self.rect.y,self.game.walls,self.lista_player,'up',True)
+			disparo = Bullet_chase(self.game,self.rect.x+96,self.rect.y,self.game.walls)
 			self.game.lista_disparos.add(disparo)
 
 	
@@ -44,6 +44,8 @@ class Boss(pg.sprite.Sprite):
 			while i<=cant:
 				i+=1
 				disparo = Disparos(self.game, self.rect.x+pos_x, self.rect.y+pos_y, self.game.walls,self.lista_player,dire)
+				if self.heal <= 100:
+					disparo.speed = 2
 				self.game.lista_disparos.add(disparo)
 				pos_x+=16
 			j+=1
@@ -51,29 +53,22 @@ class Boss(pg.sprite.Sprite):
 		
 
 	def update(self):
-		self.pos = random.randint(0,6)
-		if self.can_dis<=1:	
+		print(self.heal)
+		self.pos =random.randint(0,1)
+		if self.can_dis<=0:	
 			if self.pos==0:
 				self.disparo()
-			elif self.pos==4:
+			elif self.pos==1:
 				i=0
-				while i>=3:
+				while i<=2:
 					self.hab_1(8,dir_dis[i])
 					i+=1
-			elif self.pos==2:
-				self.hab_1(8,'downright')
-				self.hab_1(8,'upleft')
-				self.hab_1(8,'downleft')
-				self.hab_1(8,'upright')
-			elif self.pos==1:
-				self.hab_1(8,'downright')
-				self.hab_1(8,'upleft')
-				self.hab_1(8,'downleft')
-				self.hab_1(8,'upright')
-				self.hab_1(8,'down')
-				self.hab_1(8,'left')
-				self.hab_1(8,'up')
-				self.hab_1(8,'right')
+				if self.heal <= 100:
+					i=0
+					while i<=1:
+						j=dir_dis[0]+""+dir_dis[1+i]
+						self.hab_1(8,j)
+						i+=1
 			self.can_dis+=1
 		else:
 			if self.delay>=200:
@@ -86,63 +81,40 @@ class Boss(pg.sprite.Sprite):
 
 
 class Disparos(pg.sprite.Sprite):
-	cambio_x = 0
-	cambio_y = 0
 
-	def __init__(self, game, x, y,paredes,enemigos,dire,chase=False):
+	def __init__(self, game, x, y,paredes,enemigos,dire):
 	    self.groups = game.all_sprites
 	    pg.sprite.Sprite.__init__(self, self.groups)
 	    self.game = game
 	    self.image = pg.image.load('bala.png')
 	    self.rect = self.image.get_rect()
-	    self.v_disparo = 0
 	    self.damage = 1
-	    self.vx, self.vy = 0,0
+	    self.speed = 1
 	    self.rect.y = y
 	    self.rect.x = x
-	    self.chase = chase
 	    self.target = game.player
 	    self.paredes = paredes
 	    self.enemigos = enemigos
 	    self.dir = dire
 
-	def d_up(self):
-	    self.rect.top -= 3
 	def d_down(self):
-	    self.rect.bottom += 3
+	    self.rect.bottom += 3 * self.speed
 	def d_right(self):
-	    self.rect.right += 3
+	    self.rect.right += 3 * self.speed
 	def d_left(self):
-	    self.rect.left -= 3
+	    self.rect.left -= 3 * self.speed
 
-	def d_up_left(self):
-		self.rect.top -=3
-		self.rect.left -= 3
-
-	def d_up_right(self):
-		self.rect.top -= 3
-		self.rect.right += 3
 
 	def d_bottom_left(self):
-		self.rect.bottom += 3
-		self.rect.left -= 3
+		self.rect.bottom += 3 * self.speed
+		self.rect.left -= 3 * self.speed
 
 	def d_bottom_right(self):
-		self.rect.bottom += 3
-		self.rect.right += 3
-
-	def movement_wall(self):
-		self.vx, self.vy = self.target.rect.x - self.rect.x, self.target.rect.y - self.rect.y 
-		dist = math.hypot(self.vx, self.vy)
-		if dist == 0:
-		    dist = 1
-		else:
-		    self.vx, self.vy = self.vx / dist, self.vy / dist
+		self.rect.bottom += 3 * self.speed
+		self.rect.right += 3 * self.speed
 
 	def movement(self):
-		if self.dir=='up':
-			self.d_up()
-		elif self.dir=='upleft':
+		if self.dir=='upleft':
 			self.d_up_left()
 		elif self.dir=='upright':
 			self.d_up_right()
@@ -158,12 +130,48 @@ class Disparos(pg.sprite.Sprite):
 			self.d_left()
 
 	def update(self):
-		if self.chase:
-			self.image = pg.image.load('bala_chaser.png')
-			self.damage = 2
-			self.movement_wall()
+		self.movement()
+		self.colision()
+
+	def colision(self):
+	    lista_paredes = pg.sprite.spritecollide(self,self.paredes,False)
+	    lista_enemigos = pg.sprite.collide_rect(self,self.game.player)
+	    for i in lista_paredes:
+	        self.kill()
+	    if lista_enemigos:
+	    	self.kill()
+	    	self.game.player.heal -= self.damage
+	    	if self.game.player.heal <= 0:
+	    		self.game.player.kill()
+
+
+class Bullet_chase(pg.sprite.Sprite):
+	def __init__(self, game, x, y,paredes):
+	    self.groups = game.all_sprites, game.lista_enemigos
+	    pg.sprite.Sprite.__init__(self, self.groups)
+	    self.game = game
+	    self.image = pg.image.load('bala_chaser.png')
+	    self.rect = self.image.get_rect()
+	    self.damage = 2.5
+	    self.heal = 3
+	    self.vx, self.vy = 0,0
+	    self.rect.y = y
+	    self.rect.x = x
+	    self.target = game.player
+	    self.paredes = paredes
+
+	def movement(self):
+		self.vx, self.vy = self.target.rect.x - self.rect.x, self.target.rect.y - self.rect.y 
+		dist = math.hypot(self.vx, self.vy)
+		if dist == 0:
+		    dist = 1
 		else:
-			self.movement()
+		    self.vx, self.vy = self.vx / dist, self.vy / dist
+
+	def update(self):
+		if self.heal <= 0:
+			self.kill()
+		self.movement()
 		self.rect.x += self.vx * 3
 		self.rect.y += self.vy * 3 
 		self.colision()
