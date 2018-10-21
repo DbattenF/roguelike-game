@@ -6,6 +6,8 @@ from copy import copy
 import random
 
 DIRECCIONES = ['UP','DOWN','RIGHT','LEFT']
+dir_dig = ['downleft','downright']
+dir_dige = ['upleft','upright']
 
 class Player(pg.sprite.Sprite):
     def __init__(self, game, x, y):
@@ -249,6 +251,7 @@ class Disparo(pg.sprite.Sprite):
         self.damage = 1
         self.rect.y = y
         self.rect.x = x
+        self.can_reb = 0
         self.dir = direccion
         self.target = target
         self.enemigos = enemigos
@@ -258,6 +261,22 @@ class Disparo(pg.sprite.Sprite):
         if self.target.items=='ps':
             self.damage = 0.25
     
+    def d_down_left(self):
+        self.rect.bottom += 5
+        self.rect.left -= 5
+
+    def d_down_right(self):
+        self.rect.bottom += 5
+        self.rect.right += 5
+
+    def d_up_left(self):
+        self.rect.top -= 5
+        self.rect.left -= 5
+
+    def d_up_right(self):
+        self.rect.top -= 5
+        self.rect.right += 5
+
     def d_up(self):
         self.rect.top -= 5
     def d_down(self):
@@ -276,6 +295,14 @@ class Disparo(pg.sprite.Sprite):
             self.d_right()
         if self.dir=="left":
             self.d_left()
+        if self.dir=="downleft":
+            self.d_down_left()
+        if self.dir=="downright":
+            self.d_down_right()
+        if self.dir=="upleft":
+            self.d_up_left()
+        if self.dir=="upright":
+            self.d_up_right()
 
     def update(self):
 
@@ -289,14 +316,27 @@ class Disparo(pg.sprite.Sprite):
         self.dir_ant = self.dir
         for i in lista_paredes:
             if self.target.items=='bs':
+                if self.can_reb>=4:
+                    self.kill()
+                self.can_reb+=1
                 if self.dir_ant=='up':
-                    self.dir='down'
+                    j = random.randint(0,1)
+                    self.dir=dir_dig[j]
                 elif self.dir_ant=='down':
-                    self.dir='up'
+                    j = random.randint(0,1)
+                    self.dir=dir_dige[j]
                 elif self.dir_ant=='right':
                     self.dir='left'
                 elif self.dir_ant=='left':
                     self.dir='right'
+                elif self.dir_ant=='downleft':
+                    self.dir='downright'
+                elif self.dir_ant=='downright':
+                    self.dir='downleft'
+                elif self.dir_ant=='upleft':
+                    self.dir='upright'
+                elif self.dir_ant=='upright':
+                    self.dir='upleft'
             else:
                 self.kill()
 

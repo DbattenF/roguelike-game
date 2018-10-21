@@ -6,6 +6,7 @@ import random
 
 DIRECCIONES = ['UP','DOWN','RIGHT','LEFT']
 dir_dis = ['down','right','left']
+dir_dig = ['downleft','downright']
 
 class Boss(pg.sprite.Sprite):
 	def __init__(self, game, x, y):
@@ -29,12 +30,19 @@ class Boss(pg.sprite.Sprite):
 	    self.lista_player.add(self.game.player)
 
 	def disparo(self):
-			disparo = Bullet_chase(self.game,self.rect.x,self.rect.y,self.game.walls)
-			self.game.lista_disparos.add(disparo)
-			disparo = Bullet_chase(self.game,self.rect.x+96,self.rect.y,self.game.walls)
-			self.game.lista_disparos.add(disparo)
+		disparo = Bullet_chase(self.game,self.rect.x,self.rect.y,self.game.walls)
+		self.game.lista_disparos.add(disparo)
+		disparo = Bullet_chase(self.game,self.rect.x+96,self.rect.y,self.game.walls)
+		self.game.lista_disparos.add(disparo)
 
-	
+	def chaser(self):
+		disp = chase(self.game,self.rect.x+64,self.rect.y+64,self.game.walls)
+		self.game.lista_disparos.add(disp)
+		disp = chase(self.game,self.rect.x+64,self.rect.y+64,self.game.walls)
+		self.game.lista_disparos.add(disp)
+		disp = chase(self.game,self.rect.x+64,self.rect.y+64,self.game.walls)
+		self.game.lista_disparos.add(disp)
+
 	def hab_1(self,cant,dire):
 		j=0
 		pos_y = 0
@@ -46,18 +54,21 @@ class Boss(pg.sprite.Sprite):
 				disparo = Disparos(self.game, self.rect.x+pos_x, self.rect.y+pos_y, self.game.walls,self.lista_player,dire)
 				if self.heal <= 100:
 					disparo.speed = 2
+				elif self.heal <= 50:
+					disparo.speed = 4
+				elif self.heal <= 10:
+					disparo.speed = 6
 				self.game.lista_disparos.add(disparo)
 				pos_x+=16
 			j+=1
 			pos_y+=16
 		
-
 	def update(self):
 		print(self.heal)
-		self.pos =random.randint(0,1)
+		self.pos =random.randint(0,2)
 		if self.can_dis<=0:	
 			if self.pos==0:
-				self.disparo()
+				self.chaser()
 			elif self.pos==1:
 				i=0
 				while i<=2:
@@ -78,7 +89,6 @@ class Boss(pg.sprite.Sprite):
 				self.delay+=1
 		self.rect.x += self.vx
 		self.rect.y += self.vy
-
 
 class Disparos(pg.sprite.Sprite):
 
@@ -114,11 +124,7 @@ class Disparos(pg.sprite.Sprite):
 		self.rect.right += 3 * self.speed
 
 	def movement(self):
-		if self.dir=='upleft':
-			self.d_up_left()
-		elif self.dir=='upright':
-			self.d_up_right()
-		elif self.dir=='down':
+		if self.dir=='down':
 			self.d_down()
 		elif self.dir=='downleft':
 			self.d_bottom_left()
@@ -143,7 +149,6 @@ class Disparos(pg.sprite.Sprite):
 	    	self.game.player.heal -= self.damage
 	    	if self.game.player.heal <= 0:
 	    		self.game.player.kill()
-
 
 class Bullet_chase(pg.sprite.Sprite):
 	def __init__(self, game, x, y,paredes):
@@ -181,6 +186,51 @@ class Bullet_chase(pg.sprite.Sprite):
 	    lista_enemigos = pg.sprite.collide_rect(self,self.game.player)
 	    for i in lista_paredes:
 	        self.kill()
+	    if lista_enemigos:
+	    	self.kill()
+	    	self.game.player.heal -= self.damage
+	    	if self.game.player.heal <= 0:
+	    		self.game.player.kill()
+
+class chase(pg.sprite.Sprite):
+	def __init__(self, game, x, y,paredes):
+	    self.groups = game.all_sprites
+	    pg.sprite.Sprite.__init__(self, self.groups)
+	    self.game = game
+	    self.image = pg.image.load('bala.png')
+	    self.rect = self.image.get_rect()
+	    self.damage = 1.5
+	    self.vx, self.vy = 0,0
+	    self.rect.y = y
+	    self.rect.x = x
+	    self.i = 0
+	    self.speed = 5
+	    self.target = game.player
+	    self.paredes = paredes
+
+	def movement(self):
+		if self.i==0:
+			self.vx, self.vy = self.target.rect.x - self.rect.x, self.target.rect.y - self.rect.y 
+			dist = math.hypot(self.vx, self.vy)
+			self.i=1
+			if dist == 0:
+			    dist = 1
+			else:
+			    self.vx, self.vy = self.vx / dist, self.vy / dist
+
+	def update(self):
+		self.movement()
+		self.rect.x += self.vx * self.speed
+		self.rect.y += self.vy * self.speed
+		self.colision()
+
+	def colision(self):
+	    lista_paredes = pg.sprite.spritecollide(self,self.paredes,False)
+	    lista_enemigos = pg.sprite.collide_rect(self,self.game.player)
+
+	    for i in lista_paredes:
+	        self.kill()
+
 	    if lista_enemigos:
 	    	self.kill()
 	    	self.game.player.heal -= self.damage

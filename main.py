@@ -68,7 +68,7 @@ class Game:
         self.previous_w = mapa.tilewidth
 
     def roomitem(self,x,y):
-        self.id_item = random.randint(0,2)
+        self.id_item = 1
         if self.id_item==0:
             self.item = DoubleShot(self,x,y,self.player)
         elif self.id_item==1:
