@@ -49,6 +49,7 @@ class Player(pg.sprite.Sprite):
                     self.x = hits[0].rect.right
                 self.vx = 0
                 self.rect.x = self.x
+            hits = pg.sprite.spritecollide(self, self.game.door, True)
         if dir == 'y':
             hits = pg.sprite.spritecollide(self, self.game.walls, False)
             if hits:
@@ -58,6 +59,7 @@ class Player(pg.sprite.Sprite):
                     self.y = hits[0].rect.bottom
                 self.vy = 0
                 self.rect.y = self.y
+            hits = pg.sprite.spritecollide(self, self.game.door, True)   
 
     def update(self):
         self.get_keys()
@@ -73,8 +75,8 @@ class Wall(pg.sprite.Sprite):
         self.groups = game.all_sprites, game.walls
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.Surface((TILESIZE,TILESIZE))#pg.image.load('wall.png')
-        self.image.fill(GREEN)
+        self.image = pg.image.load('wall.png')#pg.Surface((TILESIZE,TILESIZE))
+        #self.image.fill(GREEN)
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
@@ -83,7 +85,7 @@ class Wall(pg.sprite.Sprite):
 
 class Door(pg.sprite.Sprite):
     def __init__(self, game, x, y):
-        self.groups = game.all_sprites, game.walls
+        self.groups = game.all_sprites, game.door
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
@@ -91,6 +93,7 @@ class Door(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
+        self.target = game.player
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
 
@@ -103,6 +106,7 @@ class Chaser(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0, 0
         self.heal = 3
+        self.damage = 3
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
         self.target = target
@@ -117,6 +121,7 @@ class Chaser(pg.sprite.Sprite):
             self.vx, self.vy = self.vx / dist, self.vy / dist
 
     def collide_with_walls(self, dir):
+        hitse = pg.sprite.collide_rect(self,self.target)
         if dir == 'x':
             hits = pg.sprite.spritecollide(self, self.game.walls, False)
             if hits:   
@@ -135,6 +140,10 @@ class Chaser(pg.sprite.Sprite):
                     self.y = hits[0].rect.bottom
                 self.vy = 0
                 self.rect.y = self.y
+        if hitse:
+            self.target.heal -=self.damage
+            if self.target.heal<=0:
+                self.target.kill()
 
     def update(self):
         self.movement_wall()
@@ -313,6 +322,7 @@ class Disparo(pg.sprite.Sprite):
     def colision(self):
         lista_paredes = pg.sprite.spritecollide(self,self.game.walls,False)
         lista_enemigos = pg.sprite.spritecollide(self,self.enemigos,False)
+        lista_door = pg.sprite.spritecollide(self,self.game.door,False)
         self.dir_ant = self.dir
         for i in lista_paredes:
             if self.target.items=='bs':
@@ -339,6 +349,9 @@ class Disparo(pg.sprite.Sprite):
                     self.dir='upleft'
             else:
                 self.kill()
+
+        for i in lista_door:
+            self.kill()
 
         for i in lista_enemigos:
             if self.target.items=='ps':

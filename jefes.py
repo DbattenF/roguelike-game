@@ -68,7 +68,7 @@ class Boss(pg.sprite.Sprite):
 		self.pos =random.randint(0,2)
 		if self.can_dis<=0:	
 			if self.pos==0:
-				self.chaser()
+				self.disparo()
 			elif self.pos==1:
 				i=0
 				while i<=2:
@@ -82,7 +82,7 @@ class Boss(pg.sprite.Sprite):
 						i+=1
 			self.can_dis+=1
 		else:
-			if self.delay>=200:
+			if self.delay>=100:
 				self.can_dis=0
 				self.delay=0
 			else:
@@ -142,6 +142,7 @@ class Disparos(pg.sprite.Sprite):
 	def colision(self):
 	    lista_paredes = pg.sprite.spritecollide(self,self.paredes,False)
 	    lista_enemigos = pg.sprite.collide_rect(self,self.game.player)
+	    lista_door = pg.sprite.spritecollide(self,self.game.door,False)
 	    for i in lista_paredes:
 	        self.kill()
 	    if lista_enemigos:
@@ -149,6 +150,8 @@ class Disparos(pg.sprite.Sprite):
 	    	self.game.player.heal -= self.damage
 	    	if self.game.player.heal <= 0:
 	    		self.game.player.kill()
+	    for i in lista_door:
+	    	self.kill()
 
 class Bullet_chase(pg.sprite.Sprite):
 	def __init__(self, game, x, y,paredes):
@@ -182,15 +185,18 @@ class Bullet_chase(pg.sprite.Sprite):
 		self.colision()
 
 	def colision(self):
-	    lista_paredes = pg.sprite.spritecollide(self,self.paredes,False)
-	    lista_enemigos = pg.sprite.collide_rect(self,self.game.player)
-	    for i in lista_paredes:
-	        self.kill()
-	    if lista_enemigos:
-	    	self.kill()
-	    	self.game.player.heal -= self.damage
-	    	if self.game.player.heal <= 0:
-	    		self.game.player.kill()
+		lista_paredes = pg.sprite.spritecollide(self,self.paredes,False)
+		lista_enemigos = pg.sprite.collide_rect(self,self.game.player)
+		lista_door = pg.sprite.spritecollide(self,self.game.door,False)
+		for i in lista_door:
+			self.kill()
+		for i in lista_paredes:
+		    self.kill()
+		if lista_enemigos:
+			self.kill()
+			self.game.player.heal -= self.damage
+			if self.game.player.heal <= 0:
+				self.game.player.kill()
 
 class chase(pg.sprite.Sprite):
 	def __init__(self, game, x, y,paredes):
@@ -225,14 +231,17 @@ class chase(pg.sprite.Sprite):
 		self.colision()
 
 	def colision(self):
-	    lista_paredes = pg.sprite.spritecollide(self,self.paredes,False)
-	    lista_enemigos = pg.sprite.collide_rect(self,self.game.player)
+		lista_paredes = pg.sprite.spritecollide(self,self.paredes,False)
+		lista_enemigos = pg.sprite.collide_rect(self,self.game.player)
+		lista_door = pg.sprite.spritecollide(self,self.game.door,False)
+		for i in lista_door:
+			self.kill()
 
-	    for i in lista_paredes:
-	        self.kill()
+		for i in lista_paredes:
+		    self.kill()
 
-	    if lista_enemigos:
-	    	self.kill()
-	    	self.game.player.heal -= self.damage
-	    	if self.game.player.heal <= 0:
-	    		self.game.player.kill()
+		if lista_enemigos:
+			self.kill()
+			self.game.player.heal -= self.damage
+			if self.game.player.heal <= 0:
+				self.game.player.kill()
