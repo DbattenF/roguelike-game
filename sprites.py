@@ -99,7 +99,7 @@ class Door(pg.sprite.Sprite):
 
 class Chaser(pg.sprite.Sprite):
     def __init__(self, game, x, y, target):
-        self.groups = game.all_sprites
+        self.groups = game.all_sprites, game.lista_enemigos
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.image.load('chase.png')

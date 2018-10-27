@@ -1,5 +1,6 @@
 import pygame as pg
 from settings import *
+from sprites import *
 import time
 import math
 import random
@@ -20,12 +21,10 @@ class Boss(pg.sprite.Sprite):
 	    self.heal = 200
 	    self.rect.x = x * TILESIZE
 	    self.rect.y = y * TILESIZE
-	    self.speed = 3
 	    self.pos = ''
-	    self.direccion = 'LEFT'
-	    self.items=''
-	    self.can_dis=0
+	    self.can_dis = 0
 	    self.delay = 0
+	    self.port = 0
 	    self.lista_player = pg.sprite.Group()
 	    self.lista_player.add(self.game.player)
 
@@ -42,6 +41,10 @@ class Boss(pg.sprite.Sprite):
 		self.game.lista_disparos.add(disp)
 		disp = chase(self.game,self.rect.x+64,self.rect.y+64,self.game.walls)
 		self.game.lista_disparos.add(disp)
+
+	def invocacion(self):
+		self.invo = portal(self.game,self.rect.x-256,self.rect.y)
+		self.game.lista_enemigos.add(self.invo)
 
 	def hab_1(self,cant,dire):
 		j=0
@@ -64,12 +67,22 @@ class Boss(pg.sprite.Sprite):
 			pos_y+=16
 		
 	def update(self):
-		print(self.heal)
 		self.pos =random.randint(0,2)
 		if self.can_dis<=0:	
 			if self.pos==0:
-				self.disparo()
+				if self.port <=0:
+					self.invocacion()
+					self.port=1
+				elif self.invo.heal==0:
+					self.port=0
+			
 			elif self.pos==1:
+				self.disparo()
+
+			elif self.pos==2:
+				self.chaser()
+
+			elif self.pos==3:
 				i=0
 				while i<=2:
 					self.hab_1(8,dir_dis[i])
@@ -80,6 +93,7 @@ class Boss(pg.sprite.Sprite):
 						j=dir_dis[0]+""+dir_dis[1+i]
 						self.hab_1(8,j)
 						i+=1
+			
 			self.can_dis+=1
 		else:
 			if self.delay>=100:
@@ -245,3 +259,24 @@ class chase(pg.sprite.Sprite):
 			self.game.player.heal -= self.damage
 			if self.game.player.heal <= 0:
 				self.game.player.kill()
+
+class portal(pg.sprite.Sprite):
+	def __init__(self, game, x, y):
+	    self.groups = game.all_sprites, game.portals, game.lista_enemigos
+	    pg.sprite.Sprite.__init__(self, self.groups)
+	    self.game = game
+	    self.image = pg.Surface((TILESIZE,TILESIZE))
+	    self.image.fill(WHITE)
+	    self.rect = self.image.get_rect()
+	    self.rect.x = x
+	    self.rect.y = y
+	    self.heal = 4
+	    self.i = True
+
+	def update(self):
+		if self.i:
+			self.enemy = Chaser(self.game,self.rect.x/32,self.rect.y/32,self.game.player)
+			self.i = False
+		elif self.enemy.heal==0:
+			self.i = True
+

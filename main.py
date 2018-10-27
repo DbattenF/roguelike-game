@@ -21,6 +21,8 @@ class Game:
         self.lista_disparos = pg.sprite.Group()
         self.lista_enemigos = pg.sprite.Group()
         self.lista_paredes = pg.sprite.Group()
+        self.portals = pg.sprite.Group()
+        self.boss_activo = False
 
     def load_data(self):
         game_folder = path.dirname(__file__)
@@ -41,7 +43,8 @@ class Game:
                     self.lista_paredes.add(wall)
                     self.walls.add(wall)
                 if tile == '#':
-                    Door(self,col+self.total_map_w, row)
+                    self.puerta=Door(self,col+self.total_map_w, row)
+                    self.g = self.puerta.rect.left
                 if tile == 'P':
                     self.player = Player(self, col, row)
                 if tile == 'E':
@@ -104,7 +107,16 @@ class Game:
 
     def update(self):
         # update portion of the game loop
-        self.all_sprites.update()
+        for sprite in self.all_sprites:
+            if sprite.__repr__()=='<Boss sprite(in 2 groups)>':
+                if self.boss_activo:
+                    sprite.update()
+                else:
+                    if self.player.rect.right >= self.g :
+                        self.boss_activo = True
+            else:
+                sprite.update()
+
         self.camera.update(self.player)
 
     def draw_grid(self):
