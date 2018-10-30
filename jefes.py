@@ -28,6 +28,10 @@ class Boss(pg.sprite.Sprite):
 	    self.lista_player = pg.sprite.Group()
 	    self.lista_player.add(self.game.player)
 
+	def draw_health(self):
+		for hp in range(self.heal):
+			pg.draw.rect(self.game.screen,WHITE,pg.Rect(self.rect.x-128,self.rect.y-32,25,25),1)
+
 	def disparo(self):
 		disparo = Bullet_chase(self.game,self.rect.x,self.rect.y,self.game.walls)
 		self.game.lista_disparos.add(disparo)
@@ -67,7 +71,8 @@ class Boss(pg.sprite.Sprite):
 			pos_y+=16
 		
 	def update(self):
-		self.pos =random.randint(0,2)
+		self.draw_health()
+		self.pos = random.randint(0,2)
 		if self.can_dis<=0:	
 			if self.pos==0:
 				if self.port <=0:
@@ -276,7 +281,8 @@ class portal(pg.sprite.Sprite):
 	def update(self):
 		if self.i:
 			self.enemy = Chaser(self.game,self.rect.x/32,self.rect.y/32,self.game.player)
+			if self.game.jefes.heal<=200:
+				self.game.jefes.heal+=1
 			self.i = False
 		elif self.enemy.heal==0:
 			self.i = True
-
