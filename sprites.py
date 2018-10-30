@@ -3,7 +3,6 @@ from settings import *
 import math
 import random
 from copy import copy
-import random
 
 DIRECCIONES = ['UP','DOWN','RIGHT','LEFT']
 dir_dig = ['downleft','downright']
@@ -39,6 +38,45 @@ class Player(pg.sprite.Sprite):
             self.vx *= 0.7071
             self.vy *= 0.7071
 
+    def shot(self):
+        keys = pg.key.get_pressed()
+        if keys[pg.K_w]:
+            if self.items == 'ds':
+                disparo = Disparo(self.game,self.rect.x,self.rect.y,self,"up",self.game.lista_paredes,self.game.lista_enemigos)
+                self.game.lista_disparos.add(disparo)
+                disparo = Disparo(self.game,self.rect.x+20,self.rect.y,self,"up",self.game.lista_paredes,self.game.lista_enemigos)
+                self.game.lista_disparos.add(disparo)
+            else:
+                disparo = Disparo(self.game,self.rect.x,self.rect.y,self,"up",self.game.lista_paredes,self.game.lista_enemigos)
+                self.game.lista_disparos.add(disparo)
+        if keys[pg.K_s]:
+            if self.items == 'ds':
+                disparo = Disparo(self.game,self.rect.x,self.rect.y,self,"down",self.game.lista_paredes,self.game.lista_enemigos)
+                self.game.lista_disparos.add(disparo)
+                disparo = Disparo(self.game,self.rect.x+20,self.rect.y,self,"down",self.game.lista_paredes,self.game.lista_enemigos)
+                self.game.lista_disparos.add(disparo)
+            else:
+                disparo = Disparo(self.game,self.rect.x,self.rect.y,self,"down",self.game.lista_paredes,self.game.lista_enemigos)
+                self.game.lista_disparos.add(disparo)
+        if keys[pg.K_a]:
+            if self.items == 'ds':
+                disparo = Disparo(self.game,self.rect.x,self.rect.y,self,"left",self.game.lista_paredes,self.game.lista_enemigos)
+                self.game.lista_disparos.add(disparo)
+                disparo = Disparo(self.game,self.rect.x+20,self.rect.y,self,"left",self.game.lista_paredes,self.game.lista_enemigos)
+                self.game.lista_disparos.add(disparo)
+            else:
+                disparo = Disparo(self.game,self.rect.x,self.rect.y,self,"left",self.game.lista_paredes,self.game.lista_enemigos)
+                self.game.lista_disparos.add(disparo)
+        if keys[pg.K_d]:
+            if self.items == 'ds':
+                disparo = Disparo(self.game,self.rect.x,self.rect.y,self,"right",self.game.lista_paredes,self.game.lista_enemigos)
+                self.game.lista_disparos.add(disparo)
+                disparo = Disparo(self.game,self.rect.x+20,self.rect.y,self,"right",self.game.lista_paredes,self.game.lista_enemigos)
+                self.game.lista_disparos.add(disparo)
+            else:
+                disparo = Disparo(self.game,self.rect.x,self.rect.y,self,"right",self.game.lista_paredes,self.game.lista_enemigos)
+                self.game.lista_disparos.add(disparo)
+
     def collide_with_walls(self, dir):
         if dir == 'x':
             hits = pg.sprite.spritecollide(self, self.game.walls, False)
@@ -63,12 +101,14 @@ class Player(pg.sprite.Sprite):
 
     def update(self):
         self.get_keys()
+        self.shot()
         self.x += self.vx * self.game.dt
         self.y += self.vy * self.game.dt
         self.rect.x = self.x
         self.collide_with_walls('x')
         self.rect.y = self.y
         self.collide_with_walls('y')
+        
 
 class Wall(pg.sprite.Sprite):
     def __init__(self, game, x, y):
@@ -269,22 +309,6 @@ class Disparo(pg.sprite.Sprite):
     def setup_damage(self):
         if self.target.items=='ps':
             self.damage = 0.25
-    
-    def d_down_left(self):
-        self.rect.bottom += 5
-        self.rect.left -= 5
-
-    def d_down_right(self):
-        self.rect.bottom += 5
-        self.rect.right += 5
-
-    def d_up_left(self):
-        self.rect.top -= 5
-        self.rect.left -= 5
-
-    def d_up_right(self):
-        self.rect.top -= 5
-        self.rect.right += 5
 
     def d_up(self):
         self.rect.top -= 5
@@ -304,14 +328,6 @@ class Disparo(pg.sprite.Sprite):
             self.d_right()
         if self.dir=="left":
             self.d_left()
-        if self.dir=="downleft":
-            self.d_down_left()
-        if self.dir=="downright":
-            self.d_down_right()
-        if self.dir=="upleft":
-            self.d_up_left()
-        if self.dir=="upright":
-            self.d_up_right()
 
     def update(self):
 
@@ -330,23 +346,14 @@ class Disparo(pg.sprite.Sprite):
                     self.kill()
                 self.can_reb+=1
                 if self.dir_ant=='up':
-                    j = random.randint(0,1)
-                    self.dir=dir_dig[j]
+                    self.dir='down'
                 elif self.dir_ant=='down':
-                    j = random.randint(0,1)
-                    self.dir=dir_dige[j]
+                    self.dir='up'
                 elif self.dir_ant=='right':
                     self.dir='left'
                 elif self.dir_ant=='left':
                     self.dir='right'
-                elif self.dir_ant=='downleft':
-                    self.dir='downright'
-                elif self.dir_ant=='downright':
-                    self.dir='downleft'
-                elif self.dir_ant=='upleft':
-                    self.dir='upright'
-                elif self.dir_ant=='upright':
-                    self.dir='upleft'
+    
             else:
                 self.kill()
 

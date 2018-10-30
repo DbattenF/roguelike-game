@@ -114,6 +114,8 @@ class Game:
                 else:
                     if self.player.rect.right >= self.g :
                         self.boss_activo = True
+                if self.player.heal<=0:
+                    self.quit()
             else:
                 sprite.update()
 
@@ -139,6 +141,7 @@ class Game:
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
                     self.quit()   
+                """
                 if event.key == pg.K_w:
                     if self.player.items == 'ds':
                         disparo = Disparo(self,self.player.rect.x,self.player.rect.y,self.player,"up",self.lista_paredes,self.lista_enemigos)
@@ -175,7 +178,7 @@ class Game:
                     else:
                         disparo = Disparo(self,self.player.rect.x,self.player.rect.y,self.player,"left",self.lista_paredes,self.lista_enemigos)
                         self.lista_disparos.add(disparo)
-
+                """
 
     def show_start_screen(self):
         #import pdb; pdb.set_trace()
