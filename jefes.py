@@ -19,18 +19,23 @@ class Boss(pg.sprite.Sprite):
 	    self.rect = self.image.get_rect()
 	    self.vx, self.vy = 0, 0
 	    self.heal = 200
+	    self.maxheal = 200
 	    self.rect.x = x * TILESIZE
 	    self.rect.y = y * TILESIZE
 	    self.pos = ''
 	    self.can_dis = 0
 	    self.delay = 0
 	    self.port = 0
+	    self.i = 0
 	    self.lista_player = pg.sprite.Group()
 	    self.lista_player.add(self.game.player)
 
 	def draw_health(self):
-		for hp in range(self.heal):
-			pg.draw.rect(self.game.screen,WHITE,pg.Rect(self.rect.x-128,self.rect.y-32,25,25),1)
+		if self.i==0:
+			self.lifebar = Lifebar(self.game,self.rect.x-32,self.rect.y-32,self.heal,self.maxheal, self.game.player.damage)
+			self.i=1
+		self.lifebar.update(self.heal)
+		
 
 	def disparo(self):
 		disparo = Bullet_chase(self.game,self.rect.x,self.rect.y,self.game.walls)
@@ -280,9 +285,25 @@ class portal(pg.sprite.Sprite):
 
 	def update(self):
 		if self.i:
-			self.enemy = Chaser(self.game,self.rect.x/32,self.rect.y/32,self.game.player)
+			self.enemy = Chaser(self.game,self.rect.x,self.rect.y,self.game.player)
 			if self.game.jefes.heal<=200:
 				self.game.jefes.heal+=1
 			self.i = False
 		elif self.enemy.heal==0:
 			self.i = True
+
+class Lifebar(pg.sprite.Sprite):
+	def __init__(self, game, x, y, maxhp, hp, damage):
+		self.groups = game.all_sprites
+		pg.sprite.Sprite.__init__(self, self.groups)
+		self.game = game
+		self.image = pg.Surface((hp, 32))
+		self.image.fill(RED)
+		self.rect = self.image.get_rect()
+		self.rect.x = x
+		self.rect.y = y
+		self.maxhp = hp
+
+	def update(self,currenthp):
+		self.image = pg.Surface((currenthp-1,32))
+		self.image.fill(RED)

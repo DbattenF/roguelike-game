@@ -18,6 +18,7 @@ class Player(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0, 0
         self.heal = 3
+        self.damage = 1
         self.dead = False
         self.x = x * TILESIZE
         self.y = y * TILESIZE
@@ -109,7 +110,6 @@ class Player(pg.sprite.Sprite):
         self.rect.y = self.y
         self.collide_with_walls('y')
         
-
 class Wall(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.walls
@@ -297,7 +297,7 @@ class Disparo(pg.sprite.Sprite):
         self.image = pg.image.load('bala.png')
         self.rect = self.image.get_rect()
         self.v_disparo = 0
-        self.damage = 1
+        self.damage = self.game.player.damage
         self.rect.y = y
         self.rect.x = x
         self.can_reb = 0
@@ -308,7 +308,7 @@ class Disparo(pg.sprite.Sprite):
 
     def setup_damage(self):
         if self.target.items=='ps':
-            self.damage = 0.25
+            self.game.player.damage = 1
 
     def d_up(self):
         self.rect.top -= 5

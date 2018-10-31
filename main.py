@@ -45,6 +45,7 @@ class Game:
                 if tile == '#':
                     self.puerta=Door(self,col+self.total_map_w, row)
                     self.g = self.puerta.rect.left
+                    self.coorx,self.coory = self.puerta.rect.x,self.puerta.y
                 if tile == 'P':
                     self.player = Player(self, col, row)
                 if tile == 'E':
@@ -111,11 +112,16 @@ class Game:
             if sprite.__repr__()=='<Boss sprite(in 2 groups)>':
                 if self.boss_activo:
                     sprite.update()
+                    if self.jefes.heal<=1:
+                        time.sleep(0.5)
+                        self.quit()
                 else:
                     if self.player.rect.right >= self.g :
                         self.boss_activo = True
                 if self.player.heal<=0:
                     self.quit()
+            elif sprite.__repr__()=='<Lifebar sprite(in 1 groups)>':
+                pass
             else:
                 sprite.update()
 
