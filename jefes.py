@@ -6,7 +6,7 @@ import math
 import random
 
 DIRECCIONES = ['UP','DOWN','RIGHT','LEFT']
-dir_dis = ['down','right','left']
+dir_dis = ['up','down','right','left']
 dir_dig = ['downleft','downright']
 
 class Boss(pg.sprite.Sprite):
@@ -32,7 +32,8 @@ class Boss(pg.sprite.Sprite):
 
 	def draw_health(self):
 		if self.i==0:
-			self.lifebar = Lifebar(self.game,self.rect.x-32,self.rect.y-32,self.heal,self.maxheal, self.game.player.damage)
+			self.backlifebar = BackLifebar(self.game,self.rect.x-32,self.rect.y-32,self.maxheal+4)
+			self.lifebar = Lifebar(self.game,self.rect.x-30,self.rect.y-30,self.heal,self.maxheal, self.game.player.damage)
 			self.i=1
 		self.lifebar.update(self.heal)
 		
@@ -52,7 +53,7 @@ class Boss(pg.sprite.Sprite):
 		self.game.lista_disparos.add(disp)
 
 	def invocacion(self):
-		self.invo = portal(self.game,self.rect.x-256,self.rect.y)
+		self.invo = portal(self.game,self.rect.x-288,self.rect.y-192)
 		self.game.lista_enemigos.add(self.invo)
 
 	def hab_1(self,cant,dire):
@@ -77,7 +78,7 @@ class Boss(pg.sprite.Sprite):
 		
 	def update(self):
 		self.draw_health()
-		self.pos = random.randint(0,2)
+		self.pos = random.randint(0,3)
 		if self.can_dis<=0:	
 			if self.pos==0:
 				if self.port <=0:
@@ -94,19 +95,21 @@ class Boss(pg.sprite.Sprite):
 
 			elif self.pos==3:
 				i=0
-				while i<=2:
+				while i<=3:
 					self.hab_1(8,dir_dis[i])
 					i+=1
 				if self.heal <= 100:
 					i=0
 					while i<=1:
-						j=dir_dis[0]+""+dir_dis[1+i]
+						j=dir_dis[0]+""+dir_dis[2+i]
+						self.hab_1(8,j)
+						j=dir_dis[1]+""+dir_dis[2+i]
 						self.hab_1(8,j)
 						i+=1
 			
 			self.can_dis+=1
 		else:
-			if self.delay>=100:
+			if self.delay>=75:
 				self.can_dis=0
 				self.delay=0
 			else:
@@ -131,6 +134,8 @@ class Disparos(pg.sprite.Sprite):
 	    self.enemigos = enemigos
 	    self.dir = dire
 
+	def d_up(self):
+	    self.rect.top -= 3 * self.speed
 	def d_down(self):
 	    self.rect.bottom += 3 * self.speed
 	def d_right(self):
@@ -138,6 +143,13 @@ class Disparos(pg.sprite.Sprite):
 	def d_left(self):
 	    self.rect.left -= 3 * self.speed
 
+	def d_top_left(self):
+		self.rect.top -= 3 * self.speed
+		self.rect.left -= 3 * self.speed
+
+	def d_top_right(self):
+		self.rect.top -= 3 * self.speed
+		self.rect.right += 3 * self.speed
 
 	def d_bottom_left(self):
 		self.rect.bottom += 3 * self.speed
@@ -148,6 +160,12 @@ class Disparos(pg.sprite.Sprite):
 		self.rect.right += 3 * self.speed
 
 	def movement(self):
+		if self.dir=='up':
+			self.d_up()
+		elif self.dir=='upleft':
+			self.d_top_left()
+		elif self.dir=='upright':
+			self.d_top_right()
 		if self.dir=='down':
 			self.d_down()
 		elif self.dir=='downleft':
@@ -285,12 +303,13 @@ class portal(pg.sprite.Sprite):
 
 	def update(self):
 		if self.i:
-			self.enemy = Chaser(self.game,self.rect.x,self.rect.y,self.game.player)
-			if self.game.jefes.heal<=200:
-				self.game.jefes.heal+=1
+			self.enemy = Chaser(self.game,self.rect.x/32,self.rect.y/32,self.game.player)
 			self.i = False
 		elif self.enemy.heal==0:
 			self.i = True
+		if self.enemy.heal>=0:
+			if self.game.jefes.heal<=200:
+				self.game.jefes.heal+=0.02
 
 class Lifebar(pg.sprite.Sprite):
 	def __init__(self, game, x, y, maxhp, hp, damage):
@@ -298,7 +317,7 @@ class Lifebar(pg.sprite.Sprite):
 		pg.sprite.Sprite.__init__(self, self.groups)
 		self.game = game
 		self.image = pg.Surface((hp, 32))
-		self.image.fill(RED)
+		self.image.fill(BLACKRED)
 		self.rect = self.image.get_rect()
 		self.rect.x = x
 		self.rect.y = y
@@ -306,4 +325,15 @@ class Lifebar(pg.sprite.Sprite):
 
 	def update(self,currenthp):
 		self.image = pg.Surface((currenthp-1,32))
-		self.image.fill(RED)
+		self.image.fill(BLACKRED)
+
+class BackLifebar(pg.sprite.Sprite):
+	def __init__(self, game, x, y,hp):
+		self.groups = game.all_sprites
+		pg.sprite.Sprite.__init__(self, self.groups)
+		self.game = game
+		self.image = pg.Surface((hp, 37))
+		self.image.fill(WHITE)
+		self.rect = self.image.get_rect()
+		self.rect.x = x
+		self.rect.y = y

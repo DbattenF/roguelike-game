@@ -72,7 +72,7 @@ class Game:
         self.previous_w = mapa.tilewidth
 
     def roomitem(self,x,y):
-        self.id_item = random.randint(0,2)
+        self.id_item = 0
         if self.id_item==0:
             self.item = DoubleShot(self,x,y,self.player)
         elif self.id_item==1:
@@ -147,44 +147,6 @@ class Game:
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
                     self.quit()   
-                """
-                if event.key == pg.K_w:
-                    if self.player.items == 'ds':
-                        disparo = Disparo(self,self.player.rect.x,self.player.rect.y,self.player,"up",self.lista_paredes,self.lista_enemigos)
-                        self.lista_disparos.add(disparo)
-                        disparo = Disparo(self,self.player.rect.x+20,self.player.rect.y,self.player,"up",self.lista_paredes,self.lista_enemigos)
-                        self.lista_disparos.add(disparo)
-                    else:
-                        disparo = Disparo(self,self.player.rect.x,self.player.rect.y,self.player,"up",self.lista_paredes,self.lista_enemigos)
-                        self.lista_disparos.add(disparo)
-                if event.key == pg.K_s:
-                    if self.player.items == 'ds':
-                        disparo = Disparo(self,self.player.rect.x,self.player.rect.y,self.player,"down",self.lista_paredes,self.lista_enemigos)
-                        self.lista_disparos.add(disparo)
-                        disparo = Disparo(self,self.player.rect.x+20,self.player.rect.y,self.player,"down",self.lista_paredes,self.lista_enemigos)
-                        self.lista_disparos.add(disparo)
-                    else:
-                        disparo = Disparo(self,self.player.rect.x,self.player.rect.y,self.player,"down",self.lista_paredes,self.lista_enemigos)
-                        self.lista_disparos.add(disparo)
-                if event.key == pg.K_d:
-                    if self.player.items == 'ds':
-                        disparo = Disparo(self,self.player.rect.x,self.player.rect.y,self.player,"right",self.lista_paredes,self.lista_enemigos)
-                        self.lista_disparos.add(disparo)
-                        disparo = Disparo(self,self.player.rect.x,self.player.rect.y+20,self.player,"right",self.lista_paredes,self.lista_enemigos)
-                        self.lista_disparos.add(disparo)
-                    else:
-                        disparo = Disparo(self,self.player.rect.x,self.player.rect.y,self.player,"right",self.lista_paredes,self.lista_enemigos)
-                        self.lista_disparos.add(disparo)
-                if event.key == pg.K_a:
-                    if self.player.items == 'ds':
-                        disparo = Disparo(self,self.player.rect.x,self.player.rect.y,self.player,"left",self.lista_paredes,self.lista_enemigos)
-                        self.lista_disparos.add(disparo)
-                        disparo = Disparo(self,self.player.rect.x,self.player.rect.y+20,self.player,"left",self.lista_paredes,self.lista_enemigos)
-                        self.lista_disparos.add(disparo)
-                    else:
-                        disparo = Disparo(self,self.player.rect.x,self.player.rect.y,self.player,"left",self.lista_paredes,self.lista_enemigos)
-                        self.lista_disparos.add(disparo)
-                """
 
     def show_start_screen(self):
         #import pdb; pdb.set_trace()

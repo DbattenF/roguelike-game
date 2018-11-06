@@ -20,6 +20,13 @@ class Player(pg.sprite.Sprite):
         self.heal = 3
         self.damage = 1
         self.dead = False
+        self.can_dis = 0
+        self.delay = 0
+        self.time = 10
+        self.can = 0
+        self.o = 0
+        self.x1 = 0
+        self.y1 = 0
         self.x = x * TILESIZE
         self.y = y * TILESIZE
         self.items = ''
@@ -41,42 +48,70 @@ class Player(pg.sprite.Sprite):
 
     def shot(self):
         keys = pg.key.get_pressed()
-        if keys[pg.K_w]:
-            if self.items == 'ds':
-                disparo = Disparo(self.game,self.rect.x,self.rect.y,self,"up",self.game.lista_paredes,self.game.lista_enemigos)
-                self.game.lista_disparos.add(disparo)
-                disparo = Disparo(self.game,self.rect.x+20,self.rect.y,self,"up",self.game.lista_paredes,self.game.lista_enemigos)
-                self.game.lista_disparos.add(disparo)
+        if self.items == 'ds':
+            self.can = 1
+            self.time = 15
+        if self.can_dis<=0:
+            if keys[pg.K_w]:
+                if self.can == 0:
+                    self.x1 = 10.5
+                while(self.o <= self.can): 
+                    disparo = Disparo(self.game,self.rect.x+self.x1,self.rect.y+self.y1,self,"up",self.game.lista_paredes,self.game.lista_enemigos)
+                    self.game.lista_disparos.add(disparo)
+                    if self.can>0:
+                        self.x1 +=19
+                    self.o+=1
+                self.x1 = 0
+                self.y1 = 0
+                self.o=0
+                self.can_dis+=1
+            if keys[pg.K_s]:
+                if self.can==0:
+                    self.x1=10.5
+                while(self.o <= self.can):
+                    self.y1 = 25.5
+                    disparo = Disparo(self.game,self.rect.x+self.x1,self.rect.y+self.y1,self,"down",self.game.lista_paredes,self.game.lista_enemigos)
+                    self.game.lista_disparos.add(disparo)
+                    if self.can>0:
+                        self.x1 += 19
+                    self.o+=1
+                self.o=0
+                self.x1 = 0
+                self.y1 = 0
+                self.can_dis+=1
+            if keys[pg.K_a]:
+                if self.can <= 0:
+                    self.y1 = 10.5
+                while(self.o <= self.can):
+                    disparo = Disparo(self.game,self.rect.x+self.x1,self.rect.y+self.y1,self,"left",self.game.lista_paredes,self.game.lista_enemigos)
+                    self.game.lista_disparos.add(disparo)
+                    if self.can > 0:
+                        self.y1+=19
+                    self.o+=1
+                self.x1 = 0
+                self.y1 = 0
+                self.o=0
+                self.can_dis+=1
+            if keys[pg.K_d]:
+                if self.can <=0:
+                    self.y1 = 10.5
+                while(self.o <= self.can):
+                    self.x1 = 19
+                    disparo = Disparo(self.game,self.rect.x+self.x1,self.rect.y+self.y1,self,"right",self.game.lista_paredes,self.game.lista_enemigos)
+                    self.game.lista_disparos.add(disparo)
+                    self.o+=1
+                    if self.can > 0:
+                        self.y1 +=19
+                self.o=0
+                self.x1 = 0
+                self.y1 = 0
+                self.can_dis+=1
+        else:
+            if self.delay>=self.time:
+                self.can_dis=0
+                self.delay=0
             else:
-                disparo = Disparo(self.game,self.rect.x,self.rect.y,self,"up",self.game.lista_paredes,self.game.lista_enemigos)
-                self.game.lista_disparos.add(disparo)
-        if keys[pg.K_s]:
-            if self.items == 'ds':
-                disparo = Disparo(self.game,self.rect.x,self.rect.y,self,"down",self.game.lista_paredes,self.game.lista_enemigos)
-                self.game.lista_disparos.add(disparo)
-                disparo = Disparo(self.game,self.rect.x+20,self.rect.y,self,"down",self.game.lista_paredes,self.game.lista_enemigos)
-                self.game.lista_disparos.add(disparo)
-            else:
-                disparo = Disparo(self.game,self.rect.x,self.rect.y,self,"down",self.game.lista_paredes,self.game.lista_enemigos)
-                self.game.lista_disparos.add(disparo)
-        if keys[pg.K_a]:
-            if self.items == 'ds':
-                disparo = Disparo(self.game,self.rect.x,self.rect.y,self,"left",self.game.lista_paredes,self.game.lista_enemigos)
-                self.game.lista_disparos.add(disparo)
-                disparo = Disparo(self.game,self.rect.x+20,self.rect.y,self,"left",self.game.lista_paredes,self.game.lista_enemigos)
-                self.game.lista_disparos.add(disparo)
-            else:
-                disparo = Disparo(self.game,self.rect.x,self.rect.y,self,"left",self.game.lista_paredes,self.game.lista_enemigos)
-                self.game.lista_disparos.add(disparo)
-        if keys[pg.K_d]:
-            if self.items == 'ds':
-                disparo = Disparo(self.game,self.rect.x,self.rect.y,self,"right",self.game.lista_paredes,self.game.lista_enemigos)
-                self.game.lista_disparos.add(disparo)
-                disparo = Disparo(self.game,self.rect.x+20,self.rect.y,self,"right",self.game.lista_paredes,self.game.lista_enemigos)
-                self.game.lista_disparos.add(disparo)
-            else:
-                disparo = Disparo(self.game,self.rect.x,self.rect.y,self,"right",self.game.lista_paredes,self.game.lista_enemigos)
-                self.game.lista_disparos.add(disparo)
+                self.delay+=1
 
     def collide_with_walls(self, dir):
         if dir == 'x':
@@ -457,5 +492,3 @@ class Barril(pg.sprite.Sprite):
 
     def update(self):
         self.colision()
-
-       
