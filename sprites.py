@@ -18,7 +18,7 @@ class Player(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0, 0
         self.heal = 3
-        self.damage = 1
+        self.damage = 2
         self.dead = False
         self.can_dis = 0
         self.delay = 0
@@ -27,6 +27,7 @@ class Player(pg.sprite.Sprite):
         self.o = 0
         self.x1 = 0
         self.y1 = 0
+        self.colision = True
         self.x = x * TILESIZE
         self.y = y * TILESIZE
         self.items = ''
@@ -135,6 +136,19 @@ class Player(pg.sprite.Sprite):
                 self.rect.y = self.y
             hits = pg.sprite.spritecollide(self, self.game.door, True)   
 
+        lista_enemigos = pg.sprite.spritecollide(self,self.game.lista_enemigos,False)
+
+        for enemy in lista_enemigos:
+            if self.colision:
+                self.heal -= enemy.damage
+                self.colision = False
+                self.colision_time = pg.time.get_ticks()
+            else:
+                if pg.time.get_ticks() - self.colision_time > 1500:
+                    self.colision = True
+        if self.heal <=0:
+            self.kill()
+
     def update(self):
         self.get_keys()
         self.shot()
@@ -181,7 +195,8 @@ class Chaser(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0, 0
         self.heal = 3
-        self.damage = 3
+        self.damage = 1
+        self.colision = True
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
         self.target = target
@@ -215,10 +230,6 @@ class Chaser(pg.sprite.Sprite):
                     self.y = hits[0].rect.bottom
                 self.vy = 0
                 self.rect.y = self.y
-        if hitse:
-            self.target.heal -=self.damage
-            if self.target.heal<=0:
-                self.target.kill()
 
     def update(self):
         self.movement_wall()
@@ -237,6 +248,7 @@ class SpiderWall_y(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0, 0
         self.heal = 2
+        self.damage = 0
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
         self.speed = 3
@@ -285,6 +297,7 @@ class SpiderWall_x(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0, 0
         self.heal = 2
+        self.damage = 0
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
         self.speed = 3
@@ -322,9 +335,7 @@ class SpiderWall_x(pg.sprite.Sprite):
         self.rect.y += self.vy
 
 class Disparo(pg.sprite.Sprite):
-    cambio_x = 0
-    cambio_y = 0
-  
+
     def __init__(self, game, x, y,target,direccion,paredes,enemigos):
         self.groups = game.all_sprites
         pg.sprite.Sprite.__init__(self, self.groups)
@@ -365,7 +376,6 @@ class Disparo(pg.sprite.Sprite):
             self.d_left()
 
     def update(self):
-
         self.setup_damage()
         self.dir_disparo()
         self.colision()
@@ -396,13 +406,23 @@ class Disparo(pg.sprite.Sprite):
             self.kill()
 
         for i in lista_enemigos:
+            #mport pdb;pdb.set_trace()
+            j = i.__repr__()
             if self.target.items=='ps':
                 pass
             else:
-                self.kill()
-            i.heal -= self.damage
-            if i.heal ==0:
-                i.kill()
+                if j == '<Disparos sprite(in 3 groups)>' or j == '<chase sprite(in 3 groups)>':
+                    pass
+                else:
+                    self.kill()
+
+            j = i.__repr__()
+            if j == '<Disparos sprite(in 3 groups)>' or j == '<chase sprite(in 3 groups)>':
+                pass
+            else:
+                i.heal -= self.damage
+                if i.heal == 0:
+                    i.kill()
 
 class DoubleShot(pg.sprite.Sprite):
 

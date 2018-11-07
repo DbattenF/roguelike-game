@@ -120,7 +120,7 @@ class Boss(pg.sprite.Sprite):
 class Disparos(pg.sprite.Sprite):
 
 	def __init__(self, game, x, y,paredes,enemigos,dire):
-	    self.groups = game.all_sprites
+	    self.groups = game.all_sprites, game.lista_enemigos
 	    pg.sprite.Sprite.__init__(self, self.groups)
 	    self.game = game
 	    self.image = pg.image.load('bala.png')
@@ -133,6 +133,7 @@ class Disparos(pg.sprite.Sprite):
 	    self.paredes = paredes
 	    self.enemigos = enemigos
 	    self.dir = dire
+	    self.colision = True
 
 	def d_up(self):
 	    self.rect.top -= 3 * self.speed
@@ -179,21 +180,18 @@ class Disparos(pg.sprite.Sprite):
 
 	def update(self):
 		self.movement()
-		self.colision()
+		self.colisione()
 
-	def colision(self):
-	    lista_paredes = pg.sprite.spritecollide(self,self.paredes,False)
-	    lista_enemigos = pg.sprite.collide_rect(self,self.game.player)
-	    lista_door = pg.sprite.spritecollide(self,self.game.door,False)
-	    for i in lista_paredes:
-	        self.kill()
-	    if lista_enemigos:
-	    	self.kill()
-	    	self.game.player.heal -= self.damage
-	    	if self.game.player.heal <= 0:
-	    		self.game.player.kill()
-	    for i in lista_door:
-	    	self.kill()
+	def colisione(self):
+
+		lista_paredes = pg.sprite.spritecollide(self,self.paredes,False)
+		lista_door = pg.sprite.spritecollide(self,self.game.door,False)
+
+		for i in lista_paredes:
+		    self.kill()
+
+		for i in lista_door:
+			self.kill()
 
 class Bullet_chase(pg.sprite.Sprite):
 	def __init__(self, game, x, y,paredes):
@@ -202,7 +200,7 @@ class Bullet_chase(pg.sprite.Sprite):
 	    self.game = game
 	    self.image = pg.image.load('bala_chaser.png')
 	    self.rect = self.image.get_rect()
-	    self.damage = 2.5
+	    self.damage = 1.5
 	    self.heal = 3
 	    self.vx, self.vy = 0,0
 	    self.rect.y = y
@@ -233,21 +231,16 @@ class Bullet_chase(pg.sprite.Sprite):
 		for i in lista_door:
 			self.kill()
 		for i in lista_paredes:
-		    self.kill()
-		if lista_enemigos:
 			self.kill()
-			self.game.player.heal -= self.damage
-			if self.game.player.heal <= 0:
-				self.game.player.kill()
 
 class chase(pg.sprite.Sprite):
 	def __init__(self, game, x, y,paredes):
-	    self.groups = game.all_sprites
+	    self.groups = game.all_sprites, game.lista_enemigos
 	    pg.sprite.Sprite.__init__(self, self.groups)
 	    self.game = game
 	    self.image = pg.image.load('bala.png')
 	    self.rect = self.image.get_rect()
-	    self.damage = 1.5
+	    self.damage = 1
 	    self.vx, self.vy = 0,0
 	    self.rect.y = y
 	    self.rect.x = x
@@ -280,13 +273,7 @@ class chase(pg.sprite.Sprite):
 			self.kill()
 
 		for i in lista_paredes:
-		    self.kill()
-
-		if lista_enemigos:
 			self.kill()
-			self.game.player.heal -= self.damage
-			if self.game.player.heal <= 0:
-				self.game.player.kill()
 
 class portal(pg.sprite.Sprite):
 	def __init__(self, game, x, y):
@@ -337,3 +324,4 @@ class BackLifebar(pg.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.x = x
 		self.rect.y = y
+		
