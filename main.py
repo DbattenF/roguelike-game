@@ -23,6 +23,7 @@ class Game:
         self.lista_paredes = pg.sprite.Group()
         self.portals = pg.sprite.Group()
         self.boss_activo = False
+        self.pos_ran = 0
 
     def load_data(self):
         game_folder = path.dirname(__file__)
@@ -36,40 +37,50 @@ class Game:
         self.previous_h = 0
 
     def create_map(self,mapa):
-        for row, tiles in enumerate(mapa.data):
-            for col, tile in enumerate(tiles):
-                if tile == '1':
-                    wall=Wall(self, col+self.total_map_w, row)
-                    self.lista_paredes.add(wall)
-                    self.walls.add(wall)
-                if tile == '#':
-                    self.puerta=Door(self,col+self.total_map_w, row)
-                    self.g = self.puerta.rect.left
-                    self.coorx,self.coory = self.puerta.rect.x,self.puerta.y
-                if tile == 'P':
-                    self.player = Player(self, col, row)
-                if tile == 'E':
-                    self.enemi = Chaser(self, col+self.total_map_w, row, self.player)
-                    self.lista_enemigos.add(self.enemi)
-                if tile == 'S':
-                    self.enemi = SpiderWall_y(self, col+self.total_map_w, row,0,self.total_map_w)
-                    self.lista_enemigos.add(self.enemi)
-                if tile == 'Z':
-                    self.enemi = SpiderWall_x(self, col+self.total_map_w, row,0,self.total_map_w) 
-                    self.lista_enemigos.add(self.enemi)
-                if tile=='D':
-                    self.deco = Barril(self, col+self.total_map_w, row, self.lista_disparos)
-                    self.lista_enemigos.add(self.deco)
-                if tile=='I':
-                    self.roomitem(col+self.total_map_w,row)
-                if tile=='J':
-                    self.jefes = Boss(self, col+self.total_map_w, row)
-                    self.lista_enemigos.add(self.jefes)
-
-        self.total_map_w += mapa.tilewidth
-        self.total_map_h += mapa.tileheight
-        self.previous_h = mapa.tileheight
-        self.previous_w = mapa.tilewidth
+        i=0
+        while i<=10:
+            for row, tiles in enumerate(mapa.data):
+                for col, tile in enumerate(tiles):
+                    if tile == '1':
+                        wall=Wall(self, col+self.total_map_w, row+self.total_map_h)
+                        self.lista_paredes.add(wall)
+                        self.walls.add(wall)
+                    """
+                    if tile == '#':
+                        self.puerta=Door(self,col+self.total_map_w, row)
+                        self.g = self.puerta.rect.left
+                        self.coorx,self.coory = self.puerta.rect.x,self.puerta.y
+                    """
+                    if tile == 'P':
+                        self.player = Player(self, col, row)
+                    """
+                    if tile == 'E':
+                        self.enemi = Chaser(self, col+self.total_map_w, row, self.player)
+                        self.lista_enemigos.add(self.enemi)
+                    if tile == 'S':
+                        self.enemi = SpiderWall_y(self, col+self.total_map_w, row,0,self.total_map_w)
+                        self.lista_enemigos.add(self.enemi)
+                    if tile == 'Z':
+                        self.enemi = SpiderWall_x(self, col+self.total_map_w, row,0,self.total_map_w) 
+                        self.lista_enemigos.add(self.enemi)
+                    if tile=='D':
+                        self.deco = Barril(self, col+self.total_map_w, row, self.lista_disparos)
+                        self.lista_enemigos.add(self.deco)
+                    if tile=='I':
+                        self.roomitem(col+self.total_map_w,row)
+                    if tile=='J':
+                        self.jefes = Boss(self, col+self.total_map_w, row)
+                        self.lista_enemigos.add(self.jefes)
+                    """
+            self.pos_ran = random.randint(0,1)
+            if self.pos_ran == 0:    
+                self.total_map_w += mapa.tilewidth
+                mapa = self.map2
+            elif self.pos_ran == 1:
+                self.total_map_h += mapa.tileheight
+                mapa = self.map2
+            i+=1
+            print(self.pos_ran)
 
     def roomitem(self,x,y):
         self.id_item = 0
@@ -86,12 +97,12 @@ class Game:
         self.walls = pg.sprite.Group()
         self.door = pg.sprite.Group()
         self.create_map(self.map)
-        self.create_map(self.map2)
-        self.create_map(self.room_item)
-        self.create_map(self.room_boss)
+        #self.create_map(self.map2)
+        #self.create_map(self.room_item)
+        #self.create_map(self.room_boss)
         self.mapwitdh=self.map.width+self.map2.width+self.room_item.width+self.room_boss.width
         self.mapheight=self.map.height+self.map2.height+self.room_item.height+self.room_boss.height
-        self.camera = Camera(self.mapwitdh,self.mapheight)
+        self.camera = Camera(10000,10000)
 
     def run(self):
         # game loop - set self.playing = False to end the game
