@@ -27,10 +27,13 @@ class Game:
 
     def load_data(self):
         game_folder = path.dirname(__file__)
-        self.map = Map(path.join(game_folder, 'map2.txt'))
-        self.map2 = Map(path.join(game_folder,'map.txt'))
-        self.room_item = Map(path.join(game_folder,'room_item.txt'))
-        self.room_boss = Map(path.join(game_folder,'room_boss.txt'))
+        self.startroom = Map(path.join(game_folder, 'maps/StartRoom.txt'))
+        self.map = Map(path.join(game_folder,'maps/map.txt'))
+        self.room_item = Map(path.join(game_folder,'maps/room_item.txt'))
+        self.room_boss = Map(path.join(game_folder,'maps/room_boss.txt'))
+        self.largeroom = Map(path.join(game_folder,'maps/LargeRoom.txt'))
+        self.xlargeroom = Map(path.join(game_folder,'maps/XLargeRoom.txt'))
+        self.mapas = [self.map,self.largeroom,self.xlargeroom]
         self.total_map_w = 0
         self.total_map_h = 0
         self.previous_w = 0
@@ -45,43 +48,53 @@ class Game:
                         wall=Wall(self, col+self.total_map_w, row+self.total_map_h)
                         self.lista_paredes.add(wall)
                         self.walls.add(wall)
-                    """
                     if tile == '#':
-                        self.puerta=Door(self,col+self.total_map_w, row)
+                        self.puerta=Door(self,col+self.total_map_w, row+self.total_map_h)
                         self.g = self.puerta.rect.left
                         self.coorx,self.coory = self.puerta.rect.x,self.puerta.y
-                    """
                     if tile == 'P':
-                        self.player = Player(self, col, row)
-                    """
+                        self.player = Player(self, col, row+self.total_map_h)
                     if tile == 'E':
-                        self.enemi = Chaser(self, col+self.total_map_w, row, self.player)
+                        self.enemi = Chaser(self, col+self.total_map_w, row+self.total_map_h, self.player)
                         self.lista_enemigos.add(self.enemi)
                     if tile == 'S':
-                        self.enemi = SpiderWall_y(self, col+self.total_map_w, row,0,self.total_map_w)
+                        self.enemi = SpiderWall_y(self, col+self.total_map_w, row+self.total_map_h,0,self.total_map_w)
                         self.lista_enemigos.add(self.enemi)
                     if tile == 'Z':
-                        self.enemi = SpiderWall_x(self, col+self.total_map_w, row,0,self.total_map_w) 
+                        self.enemi = SpiderWall_x(self, col+self.total_map_w, row+self.total_map_h,0,self.total_map_w) 
                         self.lista_enemigos.add(self.enemi)
                     if tile=='D':
-                        self.deco = Barril(self, col+self.total_map_w, row, self.lista_disparos)
+                        self.deco = Barril(self, col+self.total_map_w, row+self.total_map_h, self.lista_disparos)
                         self.lista_enemigos.add(self.deco)
                     if tile=='I':
-                        self.roomitem(col+self.total_map_w,row)
+                        self.roomitem(col+self.total_map_w,row+self.total_map_h)
                     if tile=='J':
-                        self.jefes = Boss(self, col+self.total_map_w, row)
+                        self.jefes = Boss(self, col+self.total_map_w, row+self.total_map_h)
                         self.lista_enemigos.add(self.jefes)
-                    """
             self.pos_ran = random.randint(0,1)
-            if self.pos_ran == 0:    
-                self.total_map_w += mapa.tilewidth
-                mapa = self.map2
+            self.pos_map = random.randint(0,2)
+            self.pos_ant = 10
+            if self.pos_ran == 0:
+                width_ant = mapa.tilewidth    
+                self.total_map_w += width_ant
+                if i == 5:
+                    mapa = self.room_item
+                if i == 10:
+                    mapa = self.room_boss
+                if i<=4 or i<10 and i>5:
+                    mapa = self.mapas[self.pos_map]
+                i+=1
             elif self.pos_ran == 1:
+                height_ant = mapa.tileheight
                 self.total_map_h += mapa.tileheight
-                mapa = self.map2
-            i+=1
-            print(self.pos_ran)
-
+                if i == 5:
+                    mapa = self.room_item
+                if i == 10:
+                    mapa = self.room_boss
+                if i<=4 or i<10 and i>5:
+                    mapa = self.mapas[self.pos_map]
+                i+=1
+                
     def roomitem(self,x,y):
         self.id_item = 0
         if self.id_item==0:
@@ -96,12 +109,10 @@ class Game:
         self.all_sprites = pg.sprite.Group()
         self.walls = pg.sprite.Group()
         self.door = pg.sprite.Group()
-        self.create_map(self.map)
+        self.create_map(self.startroom)
         #self.create_map(self.map2)
         #self.create_map(self.room_item)
         #self.create_map(self.room_boss)
-        self.mapwitdh=self.map.width+self.map2.width+self.room_item.width+self.room_boss.width
-        self.mapheight=self.map.height+self.map2.height+self.room_item.height+self.room_boss.height
         self.camera = Camera(10000,10000)
 
     def run(self):
