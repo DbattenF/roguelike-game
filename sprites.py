@@ -421,7 +421,7 @@ class Disparo(pg.sprite.Sprite):
                 pass
             else:
                 i.heal -= self.damage
-                if i.heal == 0:
+                if i.heal <= 0:
                     i.kill()
 
 class DoubleShot(pg.sprite.Sprite):

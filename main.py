@@ -79,9 +79,10 @@ class Game:
                 self.total_map_w += width_ant
                 if i == 5:
                     mapa = self.room_item
-                if i == 10:
+                if i == 9:
+                    print("adasdasdasdas")
                     mapa = self.room_boss
-                if i<=4 or i<10 and i>5:
+                if i<=4 or i<9 and i>5:
                     mapa = self.mapas[self.pos_map]
                 i+=1
             elif self.pos_ran == 1:
@@ -89,11 +90,13 @@ class Game:
                 self.total_map_h += mapa.tileheight
                 if i == 5:
                     mapa = self.room_item
-                if i == 10:
+                if i == 9:
+                    print("asdasdasd")
                     mapa = self.room_boss
-                if i<=4 or i<10 and i>5:
+                if i<=4 or i<9 and i>5:
                     mapa = self.mapas[self.pos_map]
                 i+=1
+            print(i)
                 
     def roomitem(self,x,y):
         self.id_item = 0
@@ -130,6 +133,7 @@ class Game:
 
     def update(self):
         # update portion of the game loop
+        print(self.clock)
         for sprite in self.all_sprites:
             if sprite.__repr__()=='<Boss sprite(in 2 groups)>':
                 if self.boss_activo:
@@ -138,7 +142,7 @@ class Game:
                         time.sleep(0.5)
                         self.quit()
                 else:
-                    if self.player.rect.right >= self.g :
+                    if self.player.rect.right == self.g :
                         self.boss_activo = True
                 if self.player.heal<=0:
                     self.quit()
