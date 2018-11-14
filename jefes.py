@@ -24,6 +24,7 @@ class Boss(pg.sprite.Sprite):
 	    self.rect.y = y * TILESIZE
 	    self.pos = ''
 	    self.can_dis = 0
+	    self.damage = 2.5
 	    self.delay = 0
 	    self.port = 0
 	    self.i = 0
@@ -292,8 +293,10 @@ class portal(pg.sprite.Sprite):
 		if self.i:
 			self.enemy = Chaser(self.game,self.rect.x/32,self.rect.y/32,self.game.player)
 			self.i = False
-		elif self.enemy.heal==0:
-			self.i = True
+			self.colision_time = pg.time.get_ticks()
+		else:
+			if pg.time.get_ticks() - self.colision_time > 3500:
+				self.i = True
 		if self.enemy.heal>=0:
 			if self.game.jefes.heal<=200:
 				self.game.jefes.heal+=0.02

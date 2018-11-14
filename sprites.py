@@ -18,6 +18,7 @@ class Player(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0, 0
         self.heal = 3
+        self.maxheal = 3
         self.damage = 2
         self.dead = False
         self.can_dis = 0
@@ -27,6 +28,7 @@ class Player(pg.sprite.Sprite):
         self.o = 0
         self.x1 = 0
         self.y1 = 0
+        self.f= 0
         self.colision = True
         self.x = x * TILESIZE
         self.y = y * TILESIZE
@@ -47,66 +49,80 @@ class Player(pg.sprite.Sprite):
             self.vx *= 0.7071
             self.vy *= 0.7071
 
+
+    def shoot_and_move_down(self):
+        if self.can==0:
+            self.x1=10.5
+        while(self.o <= self.can):
+            self.y1 = 25.5
+            disparo = Disparo(self.game,self.rect.x+self.x1,self.rect.y+self.y1,self,"down",self.game.lista_paredes,self.game.lista_enemigos)
+            self.game.lista_disparos.add(disparo)
+            if self.can>0:
+                self.x1 += 19
+            self.o+=1
+        self.o=0
+        self.x1 = 0
+        self.y1 = 0
+        self.can_dis+=1
+
+
+    def shoot_and_move_up(self):
+        if self.can == 0:
+            self.x1 = 10.5
+        while(self.o <= self.can): 
+            disparo = Disparo(self.game,self.rect.x+self.x1,self.rect.y+self.y1,self,"up",self.game.lista_paredes,self.game.lista_enemigos)
+            self.game.lista_disparos.add(disparo)
+            if self.can>0:
+                self.x1 +=19
+            self.o+=1
+        self.x1 = 0
+        self.y1 = 0
+        self.o=0
+        self.can_dis+=1
+
+    def shoot_and_move_left(self):
+        if self.can <= 0:
+            self.y1 = 10.5
+        while(self.o <= self.can):
+            disparo = Disparo(self.game,self.rect.x+self.x1,self.rect.y+self.y1,self,"left",self.game.lista_paredes,self.game.lista_enemigos)
+            self.game.lista_disparos.add(disparo)
+            if self.can > 0:
+                self.y1+=19
+            self.o+=1
+        self.x1 = 0
+        self.y1 = 0
+        self.o=0
+        self.can_dis+=1
+
+    def shoot_and_move_right(self):
+        if self.can <=0:
+            self.y1 = 10.5
+        while(self.o <= self.can):
+            self.x1 = 19
+            disparo = Disparo(self.game,self.rect.x+self.x1,self.rect.y+self.y1,self,"right",self.game.lista_paredes,self.game.lista_enemigos)
+            self.game.lista_disparos.add(disparo)
+            self.o+=1
+            if self.can > 0:
+                self.y1 +=19
+        self.o=0
+        self.x1 = 0
+        self.y1 = 0
+        self.can_dis+=1
+
     def shot(self):
         keys = pg.key.get_pressed()
         if self.items == 'ds':
             self.can = 1
             self.time = 15
         if self.can_dis<=0:
-            if keys[pg.K_w]:
-                if self.can == 0:
-                    self.x1 = 10.5
-                while(self.o <= self.can): 
-                    disparo = Disparo(self.game,self.rect.x+self.x1,self.rect.y+self.y1,self,"up",self.game.lista_paredes,self.game.lista_enemigos)
-                    self.game.lista_disparos.add(disparo)
-                    if self.can>0:
-                        self.x1 +=19
-                    self.o+=1
-                self.x1 = 0
-                self.y1 = 0
-                self.o=0
-                self.can_dis+=1
+            if keys[pg.K_w]:                
+                self.shoot_and_move_up()
             if keys[pg.K_s]:
-                if self.can==0:
-                    self.x1=10.5
-                while(self.o <= self.can):
-                    self.y1 = 25.5
-                    disparo = Disparo(self.game,self.rect.x+self.x1,self.rect.y+self.y1,self,"down",self.game.lista_paredes,self.game.lista_enemigos)
-                    self.game.lista_disparos.add(disparo)
-                    if self.can>0:
-                        self.x1 += 19
-                    self.o+=1
-                self.o=0
-                self.x1 = 0
-                self.y1 = 0
-                self.can_dis+=1
+                self.shoot_and_move_down()
             if keys[pg.K_a]:
-                if self.can <= 0:
-                    self.y1 = 10.5
-                while(self.o <= self.can):
-                    disparo = Disparo(self.game,self.rect.x+self.x1,self.rect.y+self.y1,self,"left",self.game.lista_paredes,self.game.lista_enemigos)
-                    self.game.lista_disparos.add(disparo)
-                    if self.can > 0:
-                        self.y1+=19
-                    self.o+=1
-                self.x1 = 0
-                self.y1 = 0
-                self.o=0
-                self.can_dis+=1
+                self.shoot_and_move_left()                
             if keys[pg.K_d]:
-                if self.can <=0:
-                    self.y1 = 10.5
-                while(self.o <= self.can):
-                    self.x1 = 19
-                    disparo = Disparo(self.game,self.rect.x+self.x1,self.rect.y+self.y1,self,"right",self.game.lista_paredes,self.game.lista_enemigos)
-                    self.game.lista_disparos.add(disparo)
-                    self.o+=1
-                    if self.can > 0:
-                        self.y1 +=19
-                self.o=0
-                self.x1 = 0
-                self.y1 = 0
-                self.can_dis+=1
+                self.shoot_and_move_right()
         else:
             if self.delay>=self.time:
                 self.can_dis=0
@@ -214,6 +230,7 @@ class Chaser(pg.sprite.Sprite):
         hitse = pg.sprite.collide_rect(self,self.target)
         if dir == 'x':
             hits = pg.sprite.spritecollide(self, self.game.walls, False)
+            hite = pg.sprite.spritecollide(self, self.game.door, False)
             if hits:   
                 if self.vx > 0:
                     self.x = hits[0].rect.left - self.rect.width
@@ -221,13 +238,28 @@ class Chaser(pg.sprite.Sprite):
                     self.x = hits[0].rect.right
                 self.vx = 0
                 self.rect.x = self.x
+            elif hite:
+                if self.vx > 0:
+                    self.x = hite[0].rect.left - self.rect.width
+                if self.vx < 0:
+                    self.x = hite[0].rect.right
+                self.vx = 0
+                self.rect.x = self.x
         if dir == 'y':
             hits = pg.sprite.spritecollide(self, self.game.walls, False)
+            hite = pg.sprite.spritecollide(self, self.game.door, False)
             if hits:
                 if self.vy > 0:
                     self.y = hits[0].rect.top - self.rect.height
                 if self.vy < 0:
                     self.y = hits[0].rect.bottom
+                self.vy = 0
+                self.rect.y = self.y
+            elif hite:
+                if self.vy > 0:
+                    self.y = hite[0].rect.top - self.rect.height
+                if self.vy < 0:
+                    self.y = hite[0].rect.bottom
                 self.vy = 0
                 self.rect.y = self.y
 
@@ -252,6 +284,7 @@ class SpiderWall_y(pg.sprite.Sprite):
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
         self.speed = 3
+        self.disparo = True
         self.direccion = 'DOWN'
 
 
@@ -284,6 +317,13 @@ class SpiderWall_y(pg.sprite.Sprite):
 
     def update(self):
         self.mover()
+        if self.disparo:
+            Shot_spider(self.game,self.rect.x,self.rect.y,self.game.walls)
+            self.disparo = False
+            self.time_disparo = pg.time.get_ticks()
+        else:
+            if pg.time.get_ticks() - self.time_disparo > 1500:
+                self.disparo=True
         self.rect.x += self.vx
         self.rect.y += self.vy
         
@@ -298,6 +338,7 @@ class SpiderWall_x(pg.sprite.Sprite):
         self.vx, self.vy = 0, 0
         self.heal = 2
         self.damage = 0
+        self.disparo = True
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
         self.speed = 3
@@ -331,6 +372,13 @@ class SpiderWall_x(pg.sprite.Sprite):
 
     def update(self):
         self.mover()
+        if self.disparo:
+            Shot_spider(self.game,self.rect.x,self.rect.y,self.game.walls)
+            self.disparo = False
+            self.time_disparo = pg.time.get_ticks()
+        else:
+            if pg.time.get_ticks() - self.time_disparo > 1500:
+                self.disparo=True
         self.rect.x += self.vx
         self.rect.y += self.vy
 
@@ -512,3 +560,62 @@ class Barril(pg.sprite.Sprite):
 
     def update(self):
         self.colision()
+
+class Shot_spider(pg.sprite.Sprite):
+    def __init__(self, game, x, y,paredes):
+        self.groups = game.all_sprites, game.lista_enemigos
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.image.load('bala.png')
+        self.rect = self.image.get_rect()
+        self.damage = 1
+        self.vx, self.vy = 0,0
+        self.rect.y = y
+        self.rect.x = x
+        self.heal = 1000
+        self.i = 0
+        self.speed = 5
+        self.target = game.player
+        self.paredes = paredes
+
+    def movement(self):
+        if self.i==0:
+            self.vx, self.vy = self.target.rect.x - self.rect.x, self.target.rect.y - self.rect.y 
+            dist = math.hypot(self.vx, self.vy)
+            self.i=1
+            if dist == 0:
+                dist = 1
+            else:
+                self.vx, self.vy = self.vx / dist, self.vy / dist
+
+    def update(self):
+        self.movement()
+        self.rect.x += self.vx * self.speed
+        self.rect.y += self.vy * self.speed
+        self.colision()
+
+    def colision(self):
+        lista_paredes = pg.sprite.spritecollide(self,self.paredes,False)
+        lista_enemigos = pg.sprite.collide_rect(self,self.game.player)
+        lista_door = pg.sprite.spritecollide(self,self.game.door,False)
+        for i in lista_door:
+            self.kill()
+
+        for i in lista_paredes:
+            self.kill()
+
+class Lifebar(pg.sprite.Sprite):
+    def __init__(self, game, x, y, maxhp, hp):
+        self.groups = game.all_sprites
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((hp, 32))
+        self.image.fill(BLACKRED)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.maxhp = hp
+
+    def update(self,currenthp):
+        self.image = pg.Surface((currenthp-1,32))
+        self.image.fill(BLACKRED)

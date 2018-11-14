@@ -21,6 +21,7 @@ class Game:
         self.lista_disparos = pg.sprite.Group()
         self.lista_enemigos = pg.sprite.Group()
         self.lista_paredes = pg.sprite.Group()
+        self.lista_door = pg.sprite.Group()
         self.portals = pg.sprite.Group()
         self.boss_activo = False
         self.pos_ran = 0
@@ -50,7 +51,7 @@ class Game:
                         self.walls.add(wall)
                     if tile == '#':
                         self.puerta=Door(self,col+self.total_map_w, row+self.total_map_h)
-                        self.g = self.puerta.rect.left
+                        self.lista_door.add(self.puerta)
                         self.coorx,self.coory = self.puerta.rect.x,self.puerta.y
                     if tile == 'P':
                         self.player = Player(self, col, row+self.total_map_h)
@@ -73,7 +74,6 @@ class Game:
                         self.lista_enemigos.add(self.jefes)
             self.pos_ran = random.randint(0,1)
             self.pos_map = random.randint(0,2)
-            self.pos_ant = 10
             if self.pos_ran == 0:
                 width_ant = mapa.tilewidth    
                 self.total_map_w += width_ant
@@ -142,7 +142,7 @@ class Game:
                         time.sleep(0.5)
                         self.quit()
                 else:
-                    if self.player.rect.right == self.g :
+                    if pg.sprite.collide_rect(self.player,self.puerta) :
                         self.boss_activo = True
                 if self.player.heal<=0:
                     self.quit()
