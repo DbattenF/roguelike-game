@@ -121,10 +121,10 @@ class Boss(pg.sprite.Sprite):
 class Disparos(pg.sprite.Sprite):
 
 	def __init__(self, game, x, y,paredes,enemigos,dire):
-	    self.groups = game.all_sprites, game.lista_enemigos
+	    self.groups = game.all_sprites, game.disparos_enemigos
 	    pg.sprite.Sprite.__init__(self, self.groups)
 	    self.game = game
-	    self.image = pg.image.load('bala.png')
+	    self.image = IMG_BALA
 	    self.rect = self.image.get_rect()
 	    self.damage = 1
 	    self.speed = 1
@@ -199,7 +199,7 @@ class Bullet_chase(pg.sprite.Sprite):
 	    self.groups = game.all_sprites, game.lista_enemigos
 	    pg.sprite.Sprite.__init__(self, self.groups)
 	    self.game = game
-	    self.image = pg.image.load('bala_chaser.png')
+	    self.image = IMG_BALA_CHASER
 	    self.rect = self.image.get_rect()
 	    self.damage = 1.5
 	    self.heal = 3
@@ -236,10 +236,10 @@ class Bullet_chase(pg.sprite.Sprite):
 
 class chase(pg.sprite.Sprite):
 	def __init__(self, game, x, y,paredes):
-	    self.groups = game.all_sprites, game.lista_enemigos
+	    self.groups = game.all_sprites, game.disparos_enemigos
 	    pg.sprite.Sprite.__init__(self, self.groups)
 	    self.game = game
-	    self.image = pg.image.load('bala.png')
+	    self.image = IMG_BALA
 	    self.rect = self.image.get_rect()
 	    self.damage = 1
 	    self.vx, self.vy = 0,0

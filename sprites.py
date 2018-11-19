@@ -153,6 +153,12 @@ class Player(pg.sprite.Sprite):
             hits = pg.sprite.spritecollide(self, self.game.door, True)   
 
         lista_enemigos = pg.sprite.spritecollide(self,self.game.lista_enemigos,False)
+        lista_disparos_enemigos = pg.sprite.spritecollide(self,self.game.disparos_enemigos,False)
+
+        for dis in lista_disparos_enemigos:
+            if  pg.sprite.collide_rect(self,dis):
+                print("Me dio")
+                self.heal -= dis.damage
 
         for enemy in lista_enemigos:
             if self.colision:
@@ -180,7 +186,7 @@ class Wall(pg.sprite.Sprite):
         self.groups = game.all_sprites, game.walls
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.image.load('wall.png')#pg.Surface((TILESIZE,TILESIZE))
+        self.image = IMG_WALL#pg.Surface((TILESIZE,TILESIZE))
         #self.image.fill(GREEN)
         self.rect = self.image.get_rect()
         self.x = x
@@ -207,7 +213,7 @@ class Chaser(pg.sprite.Sprite):
         self.groups = game.all_sprites, game.lista_enemigos
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.image.load('chase.png')
+        self.image = IMG_CHASE
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0, 0
         self.heal = 3
@@ -388,7 +394,7 @@ class Disparo(pg.sprite.Sprite):
         self.groups = game.all_sprites
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.image.load('bala.png')
+        self.image = IMG_BALA
         self.rect = self.image.get_rect()
         self.v_disparo = 0
         self.damage = self.game.player.damage
@@ -545,7 +551,7 @@ class Barril(pg.sprite.Sprite):
         self.groups = game.all_sprites, game.walls
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.image.load('barrel.png')
+        self.image = IMG_BARREL
         self.rect = self.image.get_rect()
         self.heal = 1
         self.rect.x = x * TILESIZE
@@ -563,10 +569,10 @@ class Barril(pg.sprite.Sprite):
 
 class Shot_spider(pg.sprite.Sprite):
     def __init__(self, game, x, y,paredes):
-        self.groups = game.all_sprites, game.lista_enemigos
+        self.groups = game.all_sprites, game.disparos_enemigos
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.image.load('bala.png')
+        self.image = IMG_BALA
         self.rect = self.image.get_rect()
         self.damage = 1
         self.vx, self.vy = 0,0
@@ -600,7 +606,8 @@ class Shot_spider(pg.sprite.Sprite):
         lista_door = pg.sprite.spritecollide(self,self.game.door,False)
         for i in lista_door:
             self.kill()
-
+        if lista_enemigos:
+            self.kill()
         for i in lista_paredes:
             self.kill()
 

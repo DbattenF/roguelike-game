@@ -47,7 +47,7 @@ class Game:
     def create_map(self,mapa):
         i=0
         while i<=10:
-            cuartos_totales.append(mapa)
+            cuartos_totales.append((mapa,mapa.tilewidth))
             for row, tiles in enumerate(mapa.data):
                 for col, tile in enumerate(tiles):
                     if tile == '1':
