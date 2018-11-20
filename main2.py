@@ -47,36 +47,40 @@ class Game:
     def create_map(self,mapa):
         i=0
         while i<=10:
-            cuartos_totales.append((mapa,mapa.tilewidth))
             for row, tiles in enumerate(mapa.data):
                 for col, tile in enumerate(tiles):
                     if tile == '1':
                         wall=Wall(self, col+self.total_map_w, row+self.total_map_h)
-                        self.lista_paredes.add(wall)
-                        self.walls.add(wall)
+                        mapa.list_wall.add(wall)
                     if tile == '#':
                         self.puerta=Door(self,col+self.total_map_w, row+self.total_map_h)
-                        self.lista_door.add(self.puerta)
-                        self.coorx,self.coory = self.puerta.rect.x,self.puerta.y
+                        mapa.list_door.add(self.puerta)
                     if tile == 'P':
                         self.player = Player(self, col, row+self.total_map_h)
+                        mapa.list_player.add(self.player)
                     if tile == 'E':
                         self.enemi = Chaser(self, col+self.total_map_w, row+self.total_map_h, self.player)
-                        self.lista_enemigos.add(self.enemi)
+                        mapa.list_enemis.add(self.enemi)
                     if tile == 'S':
                         self.enemi = SpiderWall_y(self, col+self.total_map_w, row+self.total_map_h,0,self.total_map_w)
-                        self.lista_enemigos.add(self.enemi)
+                        mapa.list_enemis.add(self.enemi)
                     if tile == 'Z':
                         self.enemi = SpiderWall_x(self, col+self.total_map_w, row+self.total_map_h,0,self.total_map_w) 
-                        self.lista_enemigos.add(self.enemi)
+                        mapa.list_enemis.add(self.enemi)
                     if tile=='D':
                         self.deco = Barril(self, col+self.total_map_w, row+self.total_map_h, self.lista_disparos)
-                        self.lista_enemigos.add(self.deco)
                     if tile=='I':
                         self.roomitem(col+self.total_map_w,row+self.total_map_h)
                     if tile=='J':
                         self.jefes = Boss(self, col+self.total_map_w, row+self.total_map_h)
-                        self.lista_enemigos.add(self.jefes)
+                        mapa.list_boss.add(self.jefes)
+            g = {mapa:{'walls':mapa.list_wall,'door':mapa.list_door}}
+            cuartos_totales.append(g)
+            reg=cuartos_totales[0]
+            teg=reg[mapa]
+            jeg=teg['walls']
+            import pdb; pdb.set_trace()
+
             self.pos_ran = random.randint(0,1)
             self.pos_map = random.randint(0,2)
             if self.pos_ran == 0:
@@ -87,7 +91,7 @@ class Game:
                 if i == 9:
                     mapa = self.room_boss
                 if i<=4 or i<9 and i>5:
-                    mapa = self.mapas[self.pos_map]
+                    mapa = self.mapas[0]
                 i+=1
             elif self.pos_ran == 1:
                 height_ant = mapa.tileheight
@@ -97,7 +101,7 @@ class Game:
                 if i == 9:
                     mapa = self.room_boss
                 if i<=4 or i<9 and i>5:
-                    mapa = self.mapas[self.pos_map]
+                    mapa = self.mapas[0]
                 i+=1
                        
     def roomitem(self,x,y):
@@ -118,7 +122,6 @@ class Game:
         #self.create_map(self.map2)
         #self.create_map(self.room_item)
         #self.create_map(self.room_boss)
-        print(cuartos_totales)
         self.camera = Camera(10000,10000)
 
     def run(self):
@@ -158,7 +161,6 @@ class Game:
                 pass
             else:
                 sprite.update()
-        print(cuarto_actual)
         self.camera.update(self.player)
 
     def draw_grid(self):

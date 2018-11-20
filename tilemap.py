@@ -12,6 +12,11 @@ class Map:
         self.tileheight = len(self.data)
         self.width = self.tilewidth * TILESIZE
         self.height = self.tileheight * TILESIZE
+        self.list_wall = pg.sprite.Group()
+        self.list_door = pg.sprite.Group()
+        self.list_enemis = pg.sprite.Group()
+        self.list_player = pg.sprite.Group()
+        self.list_boss = pg.sprite.Group()
 
 class Camera:
     def __init__(self, width, height):
