@@ -17,6 +17,7 @@ class Map:
         self.list_enemis = pg.sprite.Group()
         self.list_player = pg.sprite.Group()
         self.list_boss = pg.sprite.Group()
+        self.lists = [self.list_wall,self.list_door,self.list_enemis,self.list_player,self.list_boss]
 
 class Camera:
     def __init__(self, width, height):

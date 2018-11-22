@@ -30,6 +30,8 @@ class Player(pg.sprite.Sprite):
         self.y1 = 0
         self.f= 0
         self.colision = True
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
         self.x = x * TILESIZE
         self.y = y * TILESIZE
         self.items = ''
@@ -132,7 +134,7 @@ class Player(pg.sprite.Sprite):
 
     def collide_with_walls(self, dir):
         if dir == 'x':
-            hits = pg.sprite.spritecollide(self, self.game.walls, False)
+            hits = pg.sprite.spritecollide(self, self.game.cuarto_actual.list_wall, False)
             if hits:
                 if self.vx > 0:
                     self.x = hits[0].rect.left - self.rect.width
@@ -140,9 +142,9 @@ class Player(pg.sprite.Sprite):
                     self.x = hits[0].rect.right
                 self.vx = 0
                 self.rect.x = self.x
-            hits = pg.sprite.spritecollide(self, self.game.door, True)
+            hits = pg.sprite.spritecollide(self, self.game.cuarto_actual.list_door, True)
         if dir == 'y':
-            hits = pg.sprite.spritecollide(self, self.game.walls, False)
+            hits = pg.sprite.spritecollide(self, self.game.cuarto_actual.list_wall, False)
             if hits:
                 if self.vy > 0:
                     self.y = hits[0].rect.top - self.rect.height
@@ -150,7 +152,7 @@ class Player(pg.sprite.Sprite):
                     self.y = hits[0].rect.bottom
                 self.vy = 0
                 self.rect.y = self.y
-            hits = pg.sprite.spritecollide(self, self.game.door, True)   
+            hits = pg.sprite.spritecollide(self, self.game.cuarto_actual.list_door, True)   
 
         lista_enemigos = pg.sprite.spritecollide(self,self.game.lista_enemigos,False)
         lista_disparos_enemigos = pg.sprite.spritecollide(self,self.game.disparos_enemigos,False)
@@ -235,8 +237,8 @@ class Chaser(pg.sprite.Sprite):
     def collide_with_walls(self, dir):
         hitse = pg.sprite.collide_rect(self,self.target)
         if dir == 'x':
-            hits = pg.sprite.spritecollide(self, self.game.walls, False)
-            hite = pg.sprite.spritecollide(self, self.game.door, False)
+            hits = pg.sprite.spritecollide(self, self.game.cuarto_actual.list_wall, False)
+            hite = pg.sprite.spritecollide(self, self.game.cuarto_actual.list_door, False)
             if hits:   
                 if self.vx > 0:
                     self.x = hits[0].rect.left - self.rect.width
@@ -252,8 +254,8 @@ class Chaser(pg.sprite.Sprite):
                 self.vx = 0
                 self.rect.x = self.x
         if dir == 'y':
-            hits = pg.sprite.spritecollide(self, self.game.walls, False)
-            hite = pg.sprite.spritecollide(self, self.game.door, False)
+            hits = pg.sprite.spritecollide(self, self.game.cuarto_actual.list_wall, False)
+            hite = pg.sprite.spritecollide(self, self.game.cuarto_actual.list_door, False)
             if hits:
                 if self.vy > 0:
                     self.y = hits[0].rect.top - self.rect.height
@@ -309,7 +311,7 @@ class SpiderWall_y(pg.sprite.Sprite):
             self.vy = 0
             
     def mover(self):
-        hits = pg.sprite.spritecollide(self,self.game.walls,False)
+        hits = pg.sprite.spritecollide(self,self.game.cuarto_actual.list_wall,False)
         if hits:
             direccion_actual = DIRECCIONES.index(self.direccion)
             if direccion_actual == 0:
@@ -324,7 +326,7 @@ class SpiderWall_y(pg.sprite.Sprite):
     def update(self):
         self.mover()
         if self.disparo:
-            Shot_spider(self.game,self.rect.x,self.rect.y,self.game.walls)
+            Shot_spider(self.game,self.rect.x,self.rect.y,self.game.cuarto_actual.list_wall)
             self.disparo = False
             self.time_disparo = pg.time.get_ticks()
         else:
@@ -366,7 +368,7 @@ class SpiderWall_x(pg.sprite.Sprite):
             self.vy = 0
             
     def mover(self):
-        hits = pg.sprite.spritecollide(self,self.game.walls,False)
+        hits = pg.sprite.spritecollide(self,self.game.cuarto_actual.list_wall,False)
         
         if hits:
             direccion_actual = DIRECCIONES.index(self.direccion)
@@ -379,7 +381,7 @@ class SpiderWall_x(pg.sprite.Sprite):
     def update(self):
         self.mover()
         if self.disparo:
-            Shot_spider(self.game,self.rect.x,self.rect.y,self.game.walls)
+            Shot_spider(self.game,self.rect.x,self.rect.y,self.game.cuarto_actual.list_wall)
             self.disparo = False
             self.time_disparo = pg.time.get_ticks()
         else:
@@ -435,9 +437,9 @@ class Disparo(pg.sprite.Sprite):
         self.colision()
 
     def colision(self):
-        lista_paredes = pg.sprite.spritecollide(self,self.game.walls,False)
+        lista_paredes = pg.sprite.spritecollide(self,self.game.cuarto_actual.list_wall,False)
         lista_enemigos = pg.sprite.spritecollide(self,self.enemigos,False)
-        lista_door = pg.sprite.spritecollide(self,self.game.door,False)
+        lista_door = pg.sprite.spritecollide(self,self.game.cuarto_actual.list_door,False)
         self.dir_ant = self.dir
         for i in lista_paredes:
             if self.target.items=='bs':
@@ -603,7 +605,7 @@ class Shot_spider(pg.sprite.Sprite):
     def colision(self):
         lista_paredes = pg.sprite.spritecollide(self,self.paredes,False)
         lista_enemigos = pg.sprite.collide_rect(self,self.game.player)
-        lista_door = pg.sprite.spritecollide(self,self.game.door,False)
+        lista_door = pg.sprite.spritecollide(self,self.game.cuarto_actual.list_door,False)
         for i in lista_door:
             self.kill()
         if lista_enemigos:

@@ -29,6 +29,7 @@ class Game:
         self.boss_activo = False
         self.pos_ran = 0
         self.no_cuarto_actual = 0
+        self.cuarto_actual = None
 
     def load_data(self):
         game_folder = path.dirname(__file__)
@@ -47,6 +48,7 @@ class Game:
     def create_map(self,mapa):
         i=0
         while i<=10:
+            cuartos_totales.append(mapa)
             for row, tiles in enumerate(mapa.data):
                 for col, tile in enumerate(tiles):
                     if tile == '1':
@@ -74,35 +76,16 @@ class Game:
                     if tile=='J':
                         self.jefes = Boss(self, col+self.total_map_w, row+self.total_map_h)
                         mapa.list_boss.add(self.jefes)
-            g = {mapa:{'walls':mapa.list_wall,'door':mapa.list_door}}
-            cuartos_totales.append(g)
-            reg=cuartos_totales[0]
-            teg=reg[mapa]
-            jeg=teg['walls']
-            import pdb; pdb.set_trace()
-
-            self.pos_ran = random.randint(0,1)
-            self.pos_map = random.randint(0,2)
-            if self.pos_ran == 0:
-                width_ant = mapa.tilewidth    
-                self.total_map_w += width_ant
-                if i == 5:
-                    mapa = self.room_item
-                if i == 9:
-                    mapa = self.room_boss
-                if i<=4 or i<9 and i>5:
-                    mapa = self.mapas[0]
-                i+=1
-            elif self.pos_ran == 1:
-                height_ant = mapa.tileheight
-                self.total_map_h += mapa.tileheight
-                if i == 5:
-                    mapa = self.room_item
-                if i == 9:
-                    mapa = self.room_boss
-                if i<=4 or i<9 and i>5:
-                    mapa = self.mapas[0]
-                i+=1
+            mapa.list_player.add(self.player)
+            width_ant = mapa.tilewidth    
+            #self.total_map_w += width_ant
+            if i == 5:
+                mapa = self.room_item
+            if i == 9:
+                mapa = self.room_boss
+            if i<=4 or i<9 and i>5:
+                mapa = self.mapas[random.randint(0,2)]
+            i+=1
                        
     def roomitem(self,x,y):
         self.id_item = random.randint(0,2)
@@ -122,6 +105,7 @@ class Game:
         #self.create_map(self.map2)
         #self.create_map(self.room_item)
         #self.create_map(self.room_boss)
+        self.cuarto_actual = cuartos_totales[self.no_cuarto_actual]
         self.camera = Camera(10000,10000)
 
     def run(self):
@@ -140,28 +124,18 @@ class Game:
     def update(self):
         # update portion of the game loop
         #print(self.clock)
-        cuarto_actual = cuartos_totales[self.no_cuarto_actual]
-        if self.player.rect.x>300:
-            self.no_cuarto_actual = 1
-        if self.player.rect.y>300:
-            self.no_cuarto_actual = 2
+        for n in range(len(cuartos_totales)):
+            if self.no_cuarto_actual == n:
+                print(self.player.rect.x)
+                print(self.cuarto_actual.width)
+                if self.player.rect.x >= self.cuarto_actual.width-32 and self.player.rect.x <= self.cuarto_actual.width:
+                    self.no_cuarto_actual=n+1
+                    self.cuarto_actual = cuartos_totales[self.no_cuarto_actual]
         if self.player.heal<=0:
             self.quit()
-        for sprite in self.all_sprites:
-            if sprite.__repr__()=='<Boss sprite(in 2 groups)>':
-                if self.boss_activo:
-                    sprite.update()
-                    if self.jefes.heal<=1:
-                        time.sleep(0.5)
-                        self.quit()
-                else:
-                    if pg.sprite.collide_rect(self.player,self.puerta) :
-                        self.boss_activo = True
-            elif sprite.__repr__()=='<Lifebar sprite(in 1 groups)>':
-                pass
-            else:
+        for listas in self.cuarto_actual.lists:
+            for sprite in listas:
                 sprite.update()
-        self.camera.update(self.player)
 
     def draw_grid(self):
         for x in range(0, WIDTH, TILESIZE):
@@ -172,8 +146,9 @@ class Game:
     def draw(self):
         self.screen.fill(BGCOLOR)
         self.draw_grid()
-        for sprite in self.all_sprites:
-            self.screen.blit(sprite.image, self.camera.apply(sprite))
+        for listas in self.cuarto_actual.lists:
+            for sprite in listas:
+                self.screen.blit(sprite.image, sprite.rect)
         pg.display.flip()
 
     def events(self):
