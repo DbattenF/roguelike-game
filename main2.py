@@ -20,7 +20,7 @@ pg.mixer.music.load('sound/Intro.mp3')
 pg.mixer.music.set_volume(volumen)
 pg.mixer.music.play(-1)
 pygame.font.init()
-fuente = pygame.font.Font(None, 30)
+fuente = pygame.font.Font('img/dejavu.ttf', 20)
 
 class Game:
     def __init__(self):
@@ -205,7 +205,35 @@ def comenzar_nuevo_juego():
     main()
 
 def creditos():
-    pass
+    salir = False 
+    opciones = [
+        ("Volver", volver),
+        ]
+
+    screen = pygame.display.set_mode((420, 320))
+    fondo = pygame.image.load("img/fondo.png").convert()
+    texto1 = fuente.render("Santiago Faverio", 0, (0,0,0))
+    texto2 = fuente.render("7º3", 0, (0,0,0))
+    texto3 = fuente.render("Codigo de tilemap y camera:", 0, (0,0,0))
+    texto4 = fuente.render("Chris Bradfield(Github)", 0, (0,0,0))
+    menu = Menu(opciones)
+
+    while not salir:
+
+        for e in pygame.event.get():
+            if e.type == QUIT:
+                salir = True
+
+        screen.blit(fondo, (0, 0))
+        menu.actualizar()
+        menu.imprimir(screen)
+        screen.blit(texto1, (65,130))
+        screen.blit(texto2, (65,160))
+        screen.blit(texto3, (65,190))
+        screen.blit(texto4, (65,220))
+        pygame.display.flip()
+        pygame.time.delay(10)
+
 
 def salir_del_programa():
     exit(0)
