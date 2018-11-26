@@ -36,26 +36,24 @@ class Boss(pg.sprite.Sprite):
 			self.backlifebar = BackLifebar(self.game,self.rect.x-32,self.rect.y-32,self.maxheal+4)
 			self.lifebar = Lifebar(self.game,self.rect.x-30,self.rect.y-30,self.heal,self.maxheal, self.game.player.damage)
 			self.i=1
-		self.lifebar.update(self.heal)
-		
 
 	def disparo(self):
 		disparo = Bullet_chase(self.game,self.rect.x,self.rect.y,self.game.walls)
-		self.game.lista_disparos.add(disparo)
+		self.game.cuarto_actual.list_enemis.add(disparo)
 		disparo = Bullet_chase(self.game,self.rect.x+96,self.rect.y,self.game.walls)
-		self.game.lista_disparos.add(disparo)
+		self.game.cuarto_actual.list_enemis.add(disparo)
 
 	def chaser(self):
 		disp = chase(self.game,self.rect.x+64,self.rect.y+64,self.game.walls)
-		self.game.lista_disparos.add(disp)
+		self.game.cuarto_actual.list_enemis_disp.add(disp)
 		disp = chase(self.game,self.rect.x+64,self.rect.y+64,self.game.walls)
-		self.game.lista_disparos.add(disp)
+		self.game.cuarto_actual.list_enemis_disp.add(disp)
 		disp = chase(self.game,self.rect.x+64,self.rect.y+64,self.game.walls)
-		self.game.lista_disparos.add(disp)
+		self.game.cuarto_actual.list_enemis_disp.add(disp)
 
 	def invocacion(self):
 		self.invo = portal(self.game,self.rect.x-288,self.rect.y-192)
-		self.game.lista_enemigos.add(self.invo)
+		self.game.cuarto_actual.list_enemis.add(self.invo)
 
 	def hab_1(self,cant,dire):
 		j=0
@@ -72,7 +70,7 @@ class Boss(pg.sprite.Sprite):
 					disparo.speed = 4
 				elif self.heal <= 10:
 					disparo.speed = 6
-				self.game.lista_disparos.add(disparo)
+				self.game.cuarto_actual.list_enemis_disp.add(disparo)
 				pos_x+=16
 			j+=1
 			pos_y+=16
@@ -121,7 +119,7 @@ class Boss(pg.sprite.Sprite):
 class Disparos(pg.sprite.Sprite):
 
 	def __init__(self, game, x, y,paredes,enemigos,dire):
-	    self.groups = game.all_sprites, game.disparos_enemigos
+	    self.groups = game.all_sprites
 	    pg.sprite.Sprite.__init__(self, self.groups)
 	    self.game = game
 	    self.image = IMG_BALA
@@ -185,8 +183,8 @@ class Disparos(pg.sprite.Sprite):
 
 	def colisione(self):
 
-		lista_paredes = pg.sprite.spritecollide(self,self.paredes,False)
-		lista_door = pg.sprite.spritecollide(self,self.game.door,False)
+		lista_paredes = pg.sprite.spritecollide(self,self.game.cuarto_actual.list_wall,False)
+		lista_door = pg.sprite.spritecollide(self,self.game.cuarto_actual.list_door,False)
 
 		for i in lista_paredes:
 		    self.kill()
@@ -196,7 +194,7 @@ class Disparos(pg.sprite.Sprite):
 
 class Bullet_chase(pg.sprite.Sprite):
 	def __init__(self, game, x, y,paredes):
-	    self.groups = game.all_sprites, game.lista_enemigos
+	    self.groups = game.all_sprites
 	    pg.sprite.Sprite.__init__(self, self.groups)
 	    self.game = game
 	    self.image = IMG_BALA_CHASER
@@ -218,6 +216,7 @@ class Bullet_chase(pg.sprite.Sprite):
 		    self.vx, self.vy = self.vx / dist, self.vy / dist
 
 	def update(self):
+		self.drop()
 		if self.heal <= 0:
 			self.kill()
 		self.movement()
@@ -225,10 +224,13 @@ class Bullet_chase(pg.sprite.Sprite):
 		self.rect.y += self.vy * 3 
 		self.colision()
 
+	def drop(self):
+		pass
+
 	def colision(self):
-		lista_paredes = pg.sprite.spritecollide(self,self.paredes,False)
+		lista_paredes = pg.sprite.spritecollide(self,self.game.cuarto_actual.list_wall,False)
 		lista_enemigos = pg.sprite.collide_rect(self,self.game.player)
-		lista_door = pg.sprite.spritecollide(self,self.game.door,False)
+		lista_door = pg.sprite.spritecollide(self,self.game.cuarto_actual.list_door,False)
 		for i in lista_door:
 			self.kill()
 		for i in lista_paredes:
@@ -289,9 +291,14 @@ class portal(pg.sprite.Sprite):
 	    self.heal = 4
 	    self.i = True
 
+	def drop(self):
+		pass
+
 	def update(self):
+		self.drop()
 		if self.i:
 			self.enemy = Chaser(self.game,self.rect.x/32,self.rect.y/32,self.game.player)
+			self.game.cuarto_actual.list_enemis.add(self.enemy)
 			self.i = False
 			self.colision_time = pg.time.get_ticks()
 		else:
@@ -303,7 +310,7 @@ class portal(pg.sprite.Sprite):
 
 class Lifebar(pg.sprite.Sprite):
 	def __init__(self, game, x, y, maxhp, hp, damage):
-		self.groups = game.all_sprites
+		self.groups = game.cuarto_actual.list_lifebar
 		pg.sprite.Sprite.__init__(self, self.groups)
 		self.game = game
 		self.image = pg.Surface((hp, 32))
@@ -312,14 +319,16 @@ class Lifebar(pg.sprite.Sprite):
 		self.rect.x = x
 		self.rect.y = y
 		self.maxhp = hp
+		self.boss = game.cuarto_actual.list_boss
 
-	def update(self,currenthp):
-		self.image = pg.Surface((currenthp-1,32))
+	def update(self):
+		for i in self.boss:
+			self.image = pg.Surface((i.heal,32))
 		self.image.fill(BLACKRED)
 
 class BackLifebar(pg.sprite.Sprite):
 	def __init__(self, game, x, y,hp):
-		self.groups = game.all_sprites
+		self.groups = game.cuarto_actual.list_lifebar
 		pg.sprite.Sprite.__init__(self, self.groups)
 		self.game = game
 		self.image = pg.Surface((hp, 37))

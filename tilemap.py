@@ -13,11 +13,23 @@ class Map:
         self.width = self.tilewidth * TILESIZE
         self.height = self.tileheight * TILESIZE
         self.list_wall = pg.sprite.Group()
+        self.list_floor = pg.sprite.Group()
         self.list_door = pg.sprite.Group()
         self.list_enemis = pg.sprite.Group()
         self.list_player = pg.sprite.Group()
         self.list_boss = pg.sprite.Group()
-        self.lists = [self.list_wall,self.list_door,self.list_enemis,self.list_player,self.list_boss]
+        self.list_item = pg.sprite.Group()
+        self.list_disparos = pg.sprite.Group()
+        self.list_enemis_disp = pg.sprite.Group()
+        self.list_lifebar = pg.sprite.Group()
+        self.list_drops = pg.sprite.Group()
+        self.activo = True
+        self.lists = [self.list_floor,self.list_drops,self.list_item,self.list_lifebar,self.list_wall,self.list_door,self.list_enemis,self.list_player,self.list_boss,self.list_disparos,self.list_enemis_disp]
+
+    def update(self):
+        print(self.activo)
+        if not self.list_enemis.__nonzero__() or not self.list_enemis.__nonzero__():
+            self.activo = False
 
 class Camera:
     def __init__(self, width, height):
