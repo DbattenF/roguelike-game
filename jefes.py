@@ -65,11 +65,11 @@ class Boss(pg.sprite.Sprite):
 				i+=1
 				disparo = Disparos(self.game, self.rect.x+pos_x, self.rect.y+pos_y, self.game.walls,self.lista_player,dire)
 				if self.heal <= 100:
-					disparo.speed = 2
+					disparo.speed = 1
 				elif self.heal <= 50:
-					disparo.speed = 4
+					disparo.speed = 3
 				elif self.heal <= 10:
-					disparo.speed = 6
+					disparo.speed = 4
 				self.game.cuarto_actual.list_enemis_disp.add(disparo)
 				pos_x+=16
 			j+=1

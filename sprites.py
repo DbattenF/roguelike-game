@@ -19,7 +19,7 @@ class Player(pg.sprite.Sprite):
         self.vx, self.vy = 0, 0
         self.heal = 3
         self.maxheal = 3
-        self.damage = 2
+        self.damage = 1
         self.dead = False
         self.can_dis = 0
         self.delay = 0
@@ -244,13 +244,13 @@ class Chaser(pg.sprite.Sprite):
         self.image = IMG_CHASE
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0, 0
-        self.heal = 3
+        self.heal = 6
         self.damage = 1
         self.colision = True
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
         self.target = target
-        self.speed = 3
+        self.speed = 2.5
 
     def movement_wall(self):
         self.vx, self.vy = self.target.rect.x - self.rect.x, self.target.rect.y - self.rect.y 
@@ -319,7 +319,7 @@ class SpiderWall_y(pg.sprite.Sprite):
         self.image.fill(LIGHTGREY)
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0, 0
-        self.heal = 2
+        self.heal = 4
         self.damage = 1
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
@@ -381,7 +381,7 @@ class SpiderWall_x(pg.sprite.Sprite):
         self.image.fill(LIGHTGREY)
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0, 0
-        self.heal = 2
+        self.heal = 4
         self.damage = 1
         self.disparo = True
         self.rect.x = x * TILESIZE
@@ -507,8 +507,11 @@ class Disparo(pg.sprite.Sprite):
             self.kill()
 
         for i in lista_boss:
+            if self.target.items=='ps':
+                pass
+            else:
+                self.kill()
             i.heal-=self.damage
-            self.kill()
 
         for i in lista_enemigos:
             #mport pdb;pdb.set_trace()

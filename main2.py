@@ -275,20 +275,7 @@ def pantalla_comple():
     mostrar_opciones()
 
 def status_volumen():
-    global volumen
-    j=False
-    while not j:
-        keys = pg.key.get_pressed()
-        if keys[K_o]:
-            j = True
-        if keys[K_LEFT]:
-            if volumen<1:
-                volumen-=0.1
-        if keys[K_RIGHT]:
-            if volumen>0:
-                volumen+=0.1
-        pg.mixer.music.set_volume(volumen)
-    mostrar_opciones()
+    pass
 
 def volver():
     menu()
